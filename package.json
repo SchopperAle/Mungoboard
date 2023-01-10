@@ -3,5 +3,24 @@
     "express": "^4.18.2",
     "jquery": "^3.6.3",
     "sqlite3": "^5.1.4"
-  }
+  },
+  "name": "mungoboard",
+  "description": "Das Tollste Scrumboard, mit voller Mungokraft.\r # Installation\r Projekt eineclonen\r NodeJS installieren (falls noch nicht vorhanden - Pilga ♥)\r Cmd im Projektordner öffnen\r Im cmd \"npm install\" eingeben.\r # Starten\r Mit \"node index.js\" oder \"npm run start\" starten",
+  "version": "0.0.1",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SchopperAle/Mungoboard.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SchopperAle/Mungoboard/issues"
+  },
+  "homepage": "https://github.com/SchopperAle/Mungoboard#readme"
 }
