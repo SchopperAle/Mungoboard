@@ -1,3 +1,4 @@
 {
-    "port": 80
+    "port": 80 ,
+    "databaseLocation": "./backend/database.db"
 }
