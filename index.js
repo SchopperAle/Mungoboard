@@ -53,7 +53,15 @@ function createDB(){
             mitarbeiter int not null,
             foreign key (board) references Board(id),
             foreign key (mitarbeiter) references Mitarbeiter(id),
-            constraint key PRIMARY KEY (board, mitarbeiter)
+            constraint pkey PRIMARY KEY (board, mitarbeiter)
+        );
+
+        create TABLE Aufgabe_Board (
+            aufgabe int not null,
+            board int not null,
+            foreign key (aufgabe) references Aufgabe(id),
+            foreign key (board) references Board(id),
+            constraint pkey PRIMARY KEY (aufgabe, board)
         );
     `);
 }
