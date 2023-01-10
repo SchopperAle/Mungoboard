@@ -85,7 +85,77 @@ app.post("/createMitarbeiter", (req, res) => {
 
 // Create Board
 app.post("/createBoard", (req, res) => {
+    if(req.body.beschreibung == undefined){
+        db.exec("insert into Board (name) values ('"+req.body.name+"');", (err) => {
+            if(err){
+                console.log(err);
+                res.status(404).send("Error: Could not create "+req.body.name);
+            }
+        });
+    }else {
+        db.exec("insert into Board (name, beschreibung) values ('"+req.body.name+"','"+req.body.beschreibung+"');", (err) => {
+            if(err){
+                console.log(err);
+                res.status(404).send("Error: Could not create "+req.body.name);
+            }
+        });
+    }
 
+    res.send("Created "+req.body.name);
+});
+
+//Get boards
+app.get("/boards", (req, res) => {
+    db.all("select * from Board_Mitarbeiter", (err, rows) => rows.forEach((row)=>console.log(row)));
+    console.log(req.query.name)
+    db.all("select b.name from Mitarbeiter m WHERE m.name LIKE '"+req.query.name+"' INNER JOIN Board_Mitarbeiter bm ON bm.mitarbeiter = m.id INNER JOIN Board b ON b.id = bm.board;", (err, rows) => {
+        if(err){
+            console.log(err);
+            res.status(404).send("Error loading Boards");
+            return;
+        }
+        let data = [];
+        rows.forEach((row) => {
+            console.log(row);
+            data.push(row.name);
+        });
+
+        res.send({data: data});
+    });
+});
+
+//Add to Board
+app.post("/addToBoard", (req, res) => {
+    let id, boardId;
+    let name, boardName;
+    db.all("select * from Mitarbeiter m WHERE m.name LIKE '"+req.body.mitarbeiter+"';", (err, rows) => {
+        if(err){
+            console.log(err);
+            res.send("Error");
+            return;
+        }
+
+        rows.forEach((row) => {
+            console.log(row);
+            id = row.id;
+            name = row.name;
+        })
+
+        db.all("select * from Board b WHERE b.name LIKE '"+req.body.board+"';", (err, rows) => {
+            if(err){
+                res.send("ERROR");
+                return;
+            }
+    
+            rows.forEach((row) => {
+                boardId = row.id;
+                boardName = row.name;
+            });
+
+            db.exec("insert into Board_Mitarbeiter (board, mitarbeiter) values ("+boardId+", "+id+")");
+            res.send("Added "+name+" to "+boardName);
+        });
+    });
 })
 
 app.get("/jquery.js", (req, res) => {
