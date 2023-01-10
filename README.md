@@ -1,9 +1,9 @@
 # Mungoboard
 Das Tollste Scrumboard, mit voller Mungokraft.
 # Installation
-Projekt eineclonen
-NodeJS installieren (falls noch nicht vorhanden - Pilga ♥)
-Cmd im Projektordner öffnen
-Im cmd "npm install" eingeben.
+Projekt eineclonen.<br/>
+NodeJS installieren (falls noch nicht vorhanden - Pilga ♥)<br/>
+Cmd im Projektordner öffnen<br/>
+Im cmd `npm install` eingeben.<br/>
 # Starten
-Mit "node index.js" oder "npm run start" starten
+Mit `node index.js` oder `npm run start` starten
