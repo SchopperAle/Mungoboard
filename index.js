@@ -108,7 +108,8 @@ app.post("/createBoard", (req, res) => {
 app.get("/boards", (req, res) => {
     db.all("select * from Board_Mitarbeiter", (err, rows) => rows.forEach((row)=>console.log(row)));
     console.log(req.query.name)
-    db.all("select b.name from Mitarbeiter m WHERE m.name LIKE '"+req.query.name+"' INNER JOIN Board_Mitarbeiter bm ON bm.mitarbeiter = m.id INNER JOIN Board b ON b.id = bm.board;", (err, rows) => {
+    // Geht nu ned gaunz
+    /*db.all("select b.name from Mitarbeiter m WHERE m.name LIKE '"+req.query.name+"' INNER JOIN Board_Mitarbeiter bm ON bm.mitarbeiter = m.id INNER JOIN Board b ON b.id = bm.board;", (err, rows) => {
         if(err){
             console.log(err);
             res.status(404).send("Error loading Boards");
@@ -121,7 +122,7 @@ app.get("/boards", (req, res) => {
         });
 
         res.send({data: data});
-    });
+    });*/
 });
 
 //Add to Board
