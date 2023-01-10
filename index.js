@@ -37,6 +37,7 @@ function createDB(){
             name varchar(255),
             beschreibung text,
             mitarbeiter int,
+            position varchar(16),
             foreign key (mitarbeiter) references Mitarbeiter(id)
         );
 
@@ -70,21 +71,25 @@ app.get("/", (req, res) => {
     res.sendFile(__dirname+"/web/index.html");
 });
 
+// Create Mitarbeiter
 app.post("/createMitarbeiter", (req, res) => {
-    db.exec(`
-        insert into Mitarbeiter (name) values (`+ req.body.name +`);
-    `);
-
-    db.all("select * from Mitarbeiter;", (err, rows) => {
+    db.exec("insert into Mitarbeiter (name) values ('"+ req.body.name +"');", (err) => {
         if(err){
             console.log(err);
+            res.status(404).send("Error: Could not create "+req.body.name);
         }
-        rows.forEach((row) => {
-            console.log(row);
-        });
     });
 
     res.send("Created "+req.body.name);
+});
+
+// Create Board
+app.post("/createBoard", (req, res) => {
+
+})
+
+app.get("/jquery.js", (req, res) => {
+    res.sendFile(__dirname+"/node_modules/jquery/dist/jquery.js");
 })
 
 app.listen(port, () => {
