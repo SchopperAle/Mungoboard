@@ -29,8 +29,33 @@ function createDB(){
     });
 
     db.exec(`
-        create TABLE 
-    `)
+        create TABLE Mitarbeiter (
+            id int primary key AUTOINCREMENT,
+            name varchar(255)
+        );
+
+        create TABLE Board (
+            id int primary key AUTOINCREMENT,
+            name varchar(32),
+            beschreibung text
+        );
+
+        create TABLE Aufgabe (
+            id int primary key AUTOINCREMENT,
+            name varchar(255),
+            beschreibung text,
+            mitarbeiter int,
+            foreign key (mitarbeiter) references Mitarbeiter(id)
+        );
+
+        create TABLE Board_Mitarbeiter (
+            board int not null,
+            mitarbeiter int not null,
+            foreign key (board) references Board(id),
+            foreign key (mitarbeiter) references Mitarbeiter(id),
+            constraint key PRIMARY KEY (board, mitarbeiter)
+        );
+    `);
 }
 
 // Web-Teil
