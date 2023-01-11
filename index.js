@@ -122,8 +122,8 @@ app.get("/boards", (req, res) => {
     });
 });
 
-//Add to Board
-app.post("/addToBoard", (req, res) => {
+//Add Mitarbeiter to Board
+app.post("/addMitarbeiterToBoard", (req, res) => {
     let id, boardId;
     let name, boardName;
     db.all("select * from Mitarbeiter m WHERE m.name LIKE '"+req.body.mitarbeiter+"';", (err, rows) => {
@@ -150,10 +150,56 @@ app.post("/addToBoard", (req, res) => {
                 boardName = row.name;
             });
 
-            db.exec("insert into Board_Mitarbeiter (board, mitarbeiter) values ("+boardId+", "+id+")");
+            db.exec("insert into Board_Mitarbeiter (board, mitarbeiter) values ("+boardId+", "+id+")", (err) => {
+                if(err){
+                    console.log(err);
+                    return;
+                }
+            });
             res.send("Added "+name+" to "+boardName);
         });
     });
+});
+
+// Create Aufgabe
+app.post("/createAufgabe", (req, res) => {
+    db.all("select * from Mitarbeiter where name LIKE '"+req.body.mitarbeiter+"';", (err, rows) => {
+        if(err){
+            console.log(err);
+            res.send("ERROR");
+            return;
+        }
+
+        let mitarbeiter; 
+        rows.forEach((row) => {
+            mitarbeiter = row.id;
+        });
+
+        if(req.body.beschreibung == undefined){
+            db.exec("insert into Aufgabe (name, mitarbeiter, position) values ('"+req.body.name+"', "+mitarbeiter+", 'To DO');", (err) => {
+                if(err){
+                    console.log(err);
+                    res.send("Error");
+                    return;
+                }
+            });
+        }else{
+            db.exec("insert into Aufgabe (name, beschreibung, mitarbeiter, position) values ('"+req.body.name+"', '"+req.body.beschreibung+"', "+mitarbeiter+", 'To DO');", (err)=> {
+                if(err){
+                    console.log(err);
+                    res.send("Error");
+                    return;
+                }
+            });
+        }
+    });
+
+    res.send("Created "+req.body.name);
+});
+
+// Add Aufgabe to Board
+app.post("/addAufgabeToBoard", (req, res) => {
+    // Kein bock
 })
 
 app.get("/jquery.js", (req, res) => {
