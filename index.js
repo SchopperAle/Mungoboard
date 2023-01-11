@@ -107,9 +107,8 @@ app.post("/createBoard", (req, res) => {
 //Get boards
 app.get("/boards", (req, res) => {
     db.all("select * from Board_Mitarbeiter", (err, rows) => rows.forEach((row)=>console.log(row)));
-    console.log(req.query.name)
     // Geht nu ned gaunz
-    /*db.all("select b.name from Mitarbeiter m WHERE m.name LIKE '"+req.query.name+"' INNER JOIN Board_Mitarbeiter bm ON bm.mitarbeiter = m.id INNER JOIN Board b ON b.id = bm.board;", (err, rows) => {
+    db.all("select b.name from Mitarbeiter m INNER JOIN Board_Mitarbeiter bm ON bm.mitarbeiter = m.id INNER JOIN Board b ON b.id = bm.board WHERE m.name LIKE '"+req.query.name+"' ORDER BY b.id DESC;", (err, rows) => {
         if(err){
             console.log(err);
             res.status(404).send("Error loading Boards");
@@ -117,12 +116,11 @@ app.get("/boards", (req, res) => {
         }
         let data = [];
         rows.forEach((row) => {
-            console.log(row);
             data.push(row.name);
         });
 
         res.send({data: data});
-    });*/
+    });
 });
 
 //Add to Board
