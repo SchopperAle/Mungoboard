@@ -107,7 +107,6 @@ app.post("/createBoard", (req, res) => {
 //Get boards
 app.get("/boards", (req, res) => {
     db.all("select * from Board_Mitarbeiter", (err, rows) => rows.forEach((row)=>console.log(row)));
-    // Geht nu ned gaunz
     db.all("select b.name from Mitarbeiter m INNER JOIN Board_Mitarbeiter bm ON bm.mitarbeiter = m.id INNER JOIN Board b ON b.id = bm.board WHERE m.name LIKE '"+req.query.name+"' ORDER BY b.id DESC;", (err, rows) => {
         if(err){
             console.log(err);
