@@ -319,8 +319,11 @@ app.post("/login", (req, res) => {
     db.all("Select * from Mitarbeiter WHERE name like '"+name+"';", (err, rows) => {
         if(err){
             console.log(err);
-            res.send("")
+            res.send("User not found.");
+            return;
         }
+
+        res.send({id:rows[0].id, name:rows[0].name});
     })
 })
 
