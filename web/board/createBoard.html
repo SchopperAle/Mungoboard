@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Mungoboard</title>
+    <link rel="stylesheet" href="mungoboard.css">
+    <script src="/jquery.js"></script>
+
+</head>
+<body>
+<header id="header">
+    <a href="/">MungoBoard</a>
+    <div>
+        <img id="settings" src="/web/images/icon_settings.png" alt="Einstellungen" onclick="clickSettings();">
+        <img id="user" src="/web/images/icon_user.png" alt="Benutzerprofil" onclick="clickUser();">
+    </div>
+</header>
+
+<h1>Board erstellen</h1>
+
+<form>
+    <h3>Name:</h3>
+    <input type="text" id="BoardName" placeholder="Name des Boards">
+
+    <h3>Beschreibung:</h3>
+    <textarea type="text" id="BoardBeschreibung" placeholder="Beschreibung des Boards"></textarea>
+
+    <div>
+        <img id="CreateButton" src="/web/images/icon_create.png" onclick="createBoard();">
+    </div>
+</form>
+
+<script src="/web/main.js"></script>
+<script src="/web/board/createBoard.js"></script>
+</body>
+</html>

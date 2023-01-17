@@ -85,23 +85,37 @@ app.post("/createMitarbeiter", (req, res) => {
 
 // Create Board
 app.post("/createBoard", (req, res) => {
-    if(req.body.beschreibung == undefined){
+
+    function sendId(){
+        db.all("select id from Board WHERE name LIKE '"+req.body.name+"' ORDER BY id DESC;", (err, rows) => {
+            if(err){
+                console.log(err);
+                res.send("Error: "+err);
+                return;
+            }
+
+            res.send(rows[0]);
+        })
+    }
+    if(req.body.beschreibung == undefined || req.body.beschreibung == ""){
         db.exec("insert into Board (name) values ('"+req.body.name+"');", (err) => {
             if(err){
                 console.log(err);
                 res.status(404).send("Error: Could not create "+req.body.name);
+                return;
             }
+            sendId();
         });
     }else {
         db.exec("insert into Board (name, beschreibung) values ('"+req.body.name+"','"+req.body.beschreibung+"');", (err) => {
             if(err){
                 console.log(err);
                 res.status(404).send("Error: Could not create "+req.body.name);
+                return;
             }
+            sendId();
         });
     }
-
-    res.send("Created "+req.body.name);
 });
 
 //Get boards
@@ -134,7 +148,6 @@ app.post("/addMitarbeiterToBoard", (req, res) => {
         }
 
         rows.forEach((row) => {
-            console.log(row);
             id = row.id;
             name = row.name;
         })
@@ -337,7 +350,12 @@ app.listen(port, () => {
 
 
 //DEBUG
-db.all("select * from Mitarbeiter;", (err, rows) => {
+db.all("select * from Board;", (err, rows) => {
+    rows.forEach((row) => {
+        console.log(row);
+    })
+})
+db.all("select * from Board_Mitarbeiter;", (err, rows) => {
     rows.forEach((row) => {
         console.log(row);
     })
