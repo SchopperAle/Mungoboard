@@ -126,7 +126,7 @@ app.get("/boards", (req, res) => {
 app.post("/addMitarbeiterToBoard", (req, res) => {
     let id, boardId;
     let name, boardName;
-    db.all("select * from Mitarbeiter m WHERE m.name LIKE '"+req.body.mitarbeiter+"';", (err, rows) => {
+    db.all("select * from Mitarbeiter m WHERE m.id = '"+req.body.mitarbeiter+"';", (err, rows) => {
         if(err){
             console.log(err);
             res.send("Error");
@@ -139,7 +139,7 @@ app.post("/addMitarbeiterToBoard", (req, res) => {
             name = row.name;
         })
 
-        db.all("select * from Board b WHERE b.name LIKE '"+req.body.board+"';", (err, rows) => {
+        db.all("select * from Board b WHERE b.id = '"+req.body.board+"';", (err, rows) => {
             if(err){
                 res.send("ERROR");
                 return;
@@ -163,7 +163,7 @@ app.post("/addMitarbeiterToBoard", (req, res) => {
 
 // Create Aufgabe
 app.post("/createAufgabe", (req, res) => {
-    db.all("select * from Mitarbeiter where name LIKE '"+req.body.mitarbeiter+"';", (err, rows) => {
+    db.all("select * from Mitarbeiter where id = '"+req.body.mitarbeiter+"';", (err, rows) => {
         if(err){
             console.log(err);
             res.send("ERROR");
@@ -175,6 +175,10 @@ app.post("/createAufgabe", (req, res) => {
             mitarbeiter = row.id;
         });
 
+        function createMsg(){
+            res.send("Created "+req.body.name);
+        }
+
         if(req.body.beschreibung == undefined){
             db.exec("insert into Aufgabe (name, mitarbeiter, position) values ('"+req.body.name+"', "+mitarbeiter+", 'To DO');", (err) => {
                 if(err){
@@ -182,6 +186,7 @@ app.post("/createAufgabe", (req, res) => {
                     res.send("Error");
                     return;
                 }
+                createMsg();
             });
         }else{
             db.exec("insert into Aufgabe (name, beschreibung, mitarbeiter, position) values ('"+req.body.name+"', '"+req.body.beschreibung+"', "+mitarbeiter+", 'To DO');", (err)=> {
@@ -190,16 +195,103 @@ app.post("/createAufgabe", (req, res) => {
                     res.send("Error");
                     return;
                 }
+                createMsg();
             });
         }
     });
-
-    res.send("Created "+req.body.name);
 });
 
 // Add Aufgabe to Board
 app.post("/addAufgabeToBoard", (req, res) => {
-    // Kein bock
+    let aufgabe, board, aufgabeName, boardName;
+    aufgabe = req.body.aufgabe;
+    board = req.body.board;
+
+    db.exec("insert into Aufgabe_Board (aufgabe, board) values ("+aufgabe+", "+board+");", (err) => {
+        if(err){
+            console.log(err);
+            res.send("Error: "+err);
+            return;
+        }
+        db.all("select name from aufgabe where id = "+aufgabe, (err, rows) => {
+            if(err){
+                console.log(err);
+                res.send("Error: "+err);
+                return;
+            }
+            
+            rows.forEach((row) => {
+                aufgabeName = row;
+            });
+
+            db.all("select name from board where id = "+board, (err, rows) => {
+                if(err){
+                    console.log(err);
+                    res.send("Error: "+err);
+                    return;
+                }
+                rows.forEach((row) => {
+                    boardName = row;
+                })
+                
+                res.send("Added "+aufgabeName+" to "+boardName);
+            });
+        });
+        
+    });
+});
+
+// Get Aufgaben
+app.get("/aufgaben", (req,res) => {
+    let board = req.query.board;
+    let aufgaben = [];
+
+    db.all("select * from Aufgabe a INNER JOIN Aufgabe_Board ab ON a.id = ab.aufgabe WHERE ab.board = "+board+";", (err, rows) => {
+        if(err){
+            console.log(err);
+            res.send([]);
+            return;
+        }
+
+        rows.forEach((row) => {
+            aufgaben.push({id:row.id, name:row.name, mitarbeiter:row.mitarbeiter, position:row.position});
+        });
+
+        res.send(aufgaben);
+    });
+});
+
+// Get Aufgabe genau
+app.get("/aufgabe", (req, res) => {
+    let aufgabe = req.query.aufgabe;
+
+    db.all("select * from aufgabe WHERE id = "+aufgabe+";", (err, rows) => {
+        if(err){
+            console.log(err);
+            res.send("Error: "+err);
+            return;
+        }
+
+        rows.forEach((row )=> {
+            res.send({id:row.id, name:row.name, mitarbeiter:row.mitarbeiter, position:row.position, beschreibung:row.beschreibung});
+        });
+    });
+});
+
+// Set Aufgabe Status
+app.post("/setStatus", (req, res) => {
+    let aufgabe = req.body.aufgabe;
+    let status = req.body.status;
+
+    db.exec("update Aufgabe SET status = '"+status+"' WHERE id = "+aufgabe, (err) => {
+        if(err){
+            console.log(err);
+            res.send("ERROR: "+err);
+            return;
+        }
+
+        res.send("Set Status to "+status);
+    });
 })
 
 app.get("/jquery.js", (req, res) => {
