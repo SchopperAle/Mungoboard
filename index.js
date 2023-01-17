@@ -311,6 +311,17 @@ app.post("/updateAufgabe", (req, res) => {
 
         res.send("Aufgabe Bearbeitet.");
     });
+});
+
+// Login
+app.post("/login", (req, res) => {
+    let name = req.body.name;
+    db.all("Select * from Mitarbeiter WHERE name like '"+name+"';", (err, rows) => {
+        if(err){
+            console.log(err);
+            res.send("")
+        }
+    })
 })
 
 app.get("/jquery.js", (req, res) => {
