@@ -11,3 +11,9 @@ function login(){
             }
         })
 }
+
+addEventListener("keypress", (ev) => {
+    if(ev.key == "Enter"){
+        $("#loginButton").trigger("click");
+    }
+})
