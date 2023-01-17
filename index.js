@@ -37,7 +37,7 @@ function createDB(){
             name varchar(255),
             beschreibung text,
             mitarbeiter int,
-            position varchar(16),
+            status varchar(16),
             foreign key (mitarbeiter) references Mitarbeiter(id)
         );
 
@@ -180,7 +180,7 @@ app.post("/createAufgabe", (req, res) => {
         }
 
         if(req.body.beschreibung == undefined){
-            db.exec("insert into Aufgabe (name, mitarbeiter, position) values ('"+req.body.name+"', "+mitarbeiter+", 'To DO');", (err) => {
+            db.exec("insert into Aufgabe (name, mitarbeiter, status) values ('"+req.body.name+"', "+mitarbeiter+", 'To DO');", (err) => {
                 if(err){
                     console.log(err);
                     res.send("Error");
@@ -189,7 +189,7 @@ app.post("/createAufgabe", (req, res) => {
                 createMsg();
             });
         }else{
-            db.exec("insert into Aufgabe (name, beschreibung, mitarbeiter, position) values ('"+req.body.name+"', '"+req.body.beschreibung+"', "+mitarbeiter+", 'To DO');", (err)=> {
+            db.exec("insert into Aufgabe (name, beschreibung, mitarbeiter, status) values ('"+req.body.name+"', '"+req.body.beschreibung+"', "+mitarbeiter+", 'To DO');", (err)=> {
                 if(err){
                     console.log(err);
                     res.send("Error");
@@ -254,7 +254,7 @@ app.get("/aufgaben", (req,res) => {
         }
 
         rows.forEach((row) => {
-            aufgaben.push({id:row.id, name:row.name, mitarbeiter:row.mitarbeiter, position:row.position});
+            aufgaben.push({id:row.id, name:row.name, mitarbeiter:row.mitarbeiter, status:row.status});
         });
 
         res.send(aufgaben);
@@ -273,7 +273,7 @@ app.get("/aufgabe", (req, res) => {
         }
 
         rows.forEach((row )=> {
-            res.send({id:row.id, name:row.name, mitarbeiter:row.mitarbeiter, position:row.position, beschreibung:row.beschreibung});
+            res.send({id:row.id, name:row.name, mitarbeiter:row.mitarbeiter, status:row.status, beschreibung:row.beschreibung});
         });
     });
 });
@@ -291,6 +291,25 @@ app.post("/setStatus", (req, res) => {
         }
 
         res.send("Set Status to "+status);
+    });
+});
+
+// Aufgabe Bearbeiten
+app.post("/updateAufgabe", (req, res) => {
+    let id = req.body.id;
+    let name = req.body.name;
+    let beschreibung = req.body.beschreibung;
+    let mitarbeiter = req.body.mitarbeiter;
+    let status = req.body.status;
+
+    db.exec("UPDATE Mitarbeiter SET name = '"+name+"', beschreibung='"+beschreibung+"', mitarbeiter="+mitarbeiter+", status='"+status+"' WHERE id = "+id, (err) => {
+        if(err){
+            console.log(err);
+            res.send("ERROR: "+err);
+            return;
+        }
+
+        res.send("Aufgabe Bearbeitet.");
     });
 })
 
