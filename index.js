@@ -319,11 +319,11 @@ app.post("/login", (req, res) => {
     db.all("Select * from Mitarbeiter WHERE name like '"+name+"';", (err, rows) => {
         if(err){
             console.log(err);
-            res.send("User not found.");
+            res.send("Error: "+err);
             return;
         }
 
-        res.send({id:rows[0].id, name:rows[0].name});
+        res.send(rows[0] == undefined?"Mitarbeiter wurde nicht gefunden":{id:rows[0].id, name:rows[0].name});
     })
 })
 
@@ -333,4 +333,12 @@ app.get("/jquery.js", (req, res) => {
 
 app.listen(port, () => {
     console.log("Started.", "Listening to port "+port);
+})
+
+
+//DEBUG
+db.all("select * from Mitarbeiter;", (err, rows) => {
+    rows.forEach((row) => {
+        console.log(row);
+    })
 })
