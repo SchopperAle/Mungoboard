@@ -5,6 +5,7 @@
     <title>Mungoboard</title>
 
     <link rel="stylesheet" href="/web/style.css">
+    <link rel="stylesheet" href="/web/user/login.css">
 
     <script src="/jquery.js"></script>
 </head>
@@ -16,10 +17,13 @@
             <img id="user" src="/web/images/icon_user.png" alt="Benutzerprofil" onclick="clickUser();">
         </div>
     </header>
-    <h1>Login: </h1>
-    <label for="name">Name: </label>
-    <input type="text" name="name" id="name">
-    <button id="loginButton" onclick="login();">Login</button>
+    <div id="login">
+        <h1>Login: </h1>
+        <label for="name">Name: </label>
+        <input type="text" name="name" id="name">
+        <br>
+        <button id="loginButton" onclick="login();">Login</button>
+    </div>
 
     <script src="/web/user/login.js"></script>
     <script src="/web/main.js"></script>

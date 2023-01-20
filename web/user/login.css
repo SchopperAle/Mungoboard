@@ -1,0 +1,25 @@
+#login{
+    margin: 2vw;
+    text-align: center;
+}
+
+h1 {
+    font-size: 2vw;
+}
+
+input[type="text"]{
+    background-color: #E5BA73;
+    margin: 2vw;
+    border:2px black solid;
+    font-size: 1.5vw;
+}
+
+#loginButton{
+    font-size: 2vw;
+    background-color: #E5BA73;
+    border: 2px black solid;
+}
+
+label {
+    font-size: 1.5vw;
+}

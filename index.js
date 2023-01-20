@@ -67,8 +67,31 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.use("/web", express.static("web"));
 
+// Default Route
 app.get("/", (req, res) => {
     res.sendFile(__dirname+"/web/index.html");
+});
+
+// Create Mitarbeiter Route
+app.get("/page/createMitarbeiter", (req, res) => {
+    res.sendFile(__dirname+"/web/dev/createMitarbeiter.html");
+});
+
+// Create Board Route
+app.get("/page/createBoard", (req, res) => {
+    res.sendFile(__dirname+"/web/board/createBoard.html");
+});
+
+// User Login Route
+app.get("/page/login", (req, res) => {
+    res.sendFile(__dirname+"/web/user/login.html");
+})
+
+// -> Board
+app.get("/page/board/:board", (req, res) => {
+    let board = req.params.board;
+    res.send("Board "+board);
+    // TO be continued
 });
 
 // Create Mitarbeiter
@@ -120,8 +143,7 @@ app.post("/createBoard", (req, res) => {
 
 //Get boards
 app.get("/boards", (req, res) => {
-    db.all("select * from Board_Mitarbeiter", (err, rows) => rows.forEach((row)=>console.log(row)));
-    db.all("select b.name from Mitarbeiter m INNER JOIN Board_Mitarbeiter bm ON bm.mitarbeiter = m.id INNER JOIN Board b ON b.id = bm.board WHERE m.name LIKE '"+req.query.name+"' ORDER BY b.id DESC;", (err, rows) => {
+    db.all("select * from Mitarbeiter m INNER JOIN Board_Mitarbeiter bm ON bm.mitarbeiter = m.id INNER JOIN Board b ON b.id = bm.board WHERE m.id = '"+req.query.mitarbeiter+"' ORDER BY b.id DESC;", (err, rows) => {
         if(err){
             console.log(err);
             res.status(404).send("Error loading Boards");
@@ -129,7 +151,7 @@ app.get("/boards", (req, res) => {
         }
         let data = [];
         rows.forEach((row) => {
-            data.push(row.name);
+            data.push(row);
         });
 
         res.send({data: data});

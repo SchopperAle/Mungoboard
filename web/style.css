@@ -32,3 +32,18 @@ header {
 #header a:hover {
     opacity: 0.5;
 }
+
+.board {
+    font-size: 2vw;
+    user-select: none;
+    margin: 2vw;
+    padding: 1vw;
+    border: 2px black solid;
+    background-color: #E5BA73;
+    cursor: pointer;
+}
+
+.board:hover{
+    opacity: 0.75;
+}
+

@@ -1,0 +1,19 @@
+
+if(localStorage.getItem("id") != undefined){
+    $.ajax({url:"/boards?mitarbeiter="+localStorage.getItem("id")})
+    .done((data) => {
+        let txt = "";
+
+        data.data.forEach((val) => {
+            txt+="<div id='"+val.board+"' class='board'>"+val.name+"</div>";
+        });
+
+        $("#boards").html(txt);
+
+        data.data.forEach((val) => {
+            $("#"+val.board).on("click", () => {
+                window.location.href = "/page/board/"+val.board;
+            });
+        });
+    });
+}
