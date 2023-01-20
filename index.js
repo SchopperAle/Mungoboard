@@ -85,7 +85,7 @@ app.get("/page/createBoard", (req, res) => {
 // User Login Route
 app.get("/page/login", (req, res) => {
     res.sendFile(__dirname+"/web/user/login.html");
-})
+});
 
 // To do : -> Board
 app.get("/page/board/:board", (req, res) => {
