@@ -87,7 +87,7 @@ app.get("/page/login", (req, res) => {
     res.sendFile(__dirname+"/web/user/login.html");
 })
 
-// -> Board
+// To do : -> Board
 app.get("/page/board/:board", (req, res) => {
     let board = req.params.board;
     res.send("Board "+board);
