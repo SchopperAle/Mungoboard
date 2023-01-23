@@ -351,6 +351,10 @@ app.post("/updateAufgabe", (req, res) => {
 // Login
 app.post("/login", (req, res) => {
     let name = req.body.name;
+    if(name.includes("'")){
+        res.send("SQL Injection wurde leider deaktiviert ;(");
+        return;
+    }
     db.all("Select * from Mitarbeiter WHERE name like '"+name+"';", (err, rows) => {
         if(err){
             console.log(err);
