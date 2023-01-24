@@ -1,6 +1,18 @@
+if(sessionStorage.getItem("bName") != undefined){
+    $("#BoardName").val(sessionStorage.getItem("bName"));
+    sessionStorage.removeItem("bName");
+}
+
+if(sessionStorage.getItem("bDesc") != undefined){
+    $("#BoardBeschreibung").val(sessionStorage.getItem("bDesc"));
+    sessionStorage.removeItem("bDesc");
+}
+
 function createBoard(){
     if(localStorage.getItem("id") == undefined){
         alert("Du bist nicht eingeloggt!");
+        sessionStorage.setItem("bName", $("#BoardName").val());
+        sessionStorage.setItem("bDesc", $("#BoardBeschreibung").val());
         window.location.href="/web/user/login.html";
         return;
     }
