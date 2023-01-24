@@ -4,5 +4,11 @@ function clickSettings(){
 }
 
 function clickUser(){
-    window.location.href="/page/login";
+    if(localStorage.getItem("id") == undefined){
+        window.location.href="/page/login";
+        return;
+    }else{
+        window.location.href="/page/profile";
+        return;
+    }
 }

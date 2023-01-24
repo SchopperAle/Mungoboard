@@ -69,8 +69,14 @@ app.use("/web", express.static("web"));
 
 // Default Route
 app.get("/", (req, res) => {
-    res.sendFile(__dirname+"/web/index.html");
+    res.sendFile(__dirname+"/web/board/createBoard.html");
+    // res.sendFile(__dirname+"/web/index.html");
 });
+
+// Profile Route
+app.get("/page/profile", (req, res) => {
+    res.sendFile(__dirname+"/web/index.html");
+})
 
 // Create Mitarbeiter Route
 app.get("/page/createMitarbeiter", (req, res) => {
