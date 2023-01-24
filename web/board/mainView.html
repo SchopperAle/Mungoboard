@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Mungoboard</title>
+    <link rel="stylesheet" href="/web/board/mainView.css">
+    <script src="/jquery.js"></script>
+</head>
+<body data-id="TOBESPECIFIEDID" data-name="TOBESPECIFIEDNAME" data-desc="TOBESPECIFIEDDESC">
+<header id="header">
+    <a href="/">MungoBoard</a>
+    <div class="boardName" id="projectName">Projektname</div>
+    <div>
+        <a href="./TOBESPECIFIEDID/createTask"><img id="newTask" src="/web/images/icon_newTask.png" alt="createTask" onclick="clickSettings();"></a>
+        <img id="downloadAsPDF" src="/web/images/icon_savePDF.png" alt="saveAsPDF" onclick="clickSettings();">
+        <img id="settings" src="/web/images/icon_settings.png" alt="Einstellungen" onclick="clickSettings();">
+        <img id="user" src="/web/images/icon_user.png" alt="Benutzerprofil" onclick="clickUser();">
+    </div>
+</header>
+
+
+<div class="container">
+    <div class="scrum-board">
+        <div class="board-block" id="todo" ondrop="drop(event)" ondragover="allowDrop(event)">
+            To Do
+        </div>
+    <div class="board-block" id="inprogress" ondrop="drop(event)" ondragover="allowDrop(event)">
+        In Progress
+    </div>
+    <div class="board-block" id="review" ondrop="drop(event)" ondragover="allowDrop(event)">
+        Review
+    </div>
+    <div class="board-block" id="done" ondrop="drop(event)" ondragover="allowDrop(event)">
+        Done
+    </div>
+</div>
+</div>
+
+<script src="/web/board/mainView.js"></script>
+<script src="/web/main.js"></script>
+
+</body>
+</html>

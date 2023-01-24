@@ -1,0 +1,86 @@
+body {
+    margin: 0;
+    font-family: arial, Helvetica, sans-serif;
+}
+
+header {
+    background-color: #E5BA73;
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    font-family: "Verdana", Geneva, sans-serif;
+    font-size: 2.5vw;
+}
+
+/* Add styling for the buttons in the header */
+#header img {
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    height: 2.5vw;
+    vertical-align: middle;
+}
+
+#header img:hover {
+    opacity: 0.5;
+}
+
+#header a {
+    color:black;
+    text-decoration: none;
+}
+
+#header a:hover {
+    opacity: 0.5;
+}
+
+#header #newTask{
+    height: 3vw;
+}
+
+#header #downloadAsPDF{
+    height: 3vw;
+}
+
+.boardName{
+    text-align: center;
+    font-style: italic;
+}
+
+.board-block {
+    width: 15%;
+    float: left;
+    background-color: #E5BA73;
+    padding: 20px;
+    opacity: 100%;
+    border-radius: 20px;
+    margin: 50px;
+    display: flex;
+    flex-direction: column;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.row{
+    width: 113.5%;
+}
+
+.task{
+    background-color: white;
+    padding: 30px;
+    margin: 20px;
+    border-radius: 20px;
+    user-select: none;
+    cursor: grab;
+}
+
+.headerBox{
+    text-align: center;
+    font-size: 30px;
+
+}
+
+.container{
+    display: inline;
+}
+

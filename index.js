@@ -67,6 +67,9 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.use("/web", express.static("web"));
 
+let boardMainView = ""+ fs.readFileSync("./web/board/mainView.html");
+let createTask = ""+ fs.readFileSync("./web/board/createTask.html");
+
 // Default Route
 app.get("/", (req, res) => {
     res.sendFile(__dirname+"/web/board/createBoard.html");
@@ -93,11 +96,24 @@ app.get("/page/login", (req, res) => {
     res.sendFile(__dirname+"/web/user/login.html");
 });
 
-// To do : -> Board
+// Create Task Route
+app.get("/page/board/:board/createTask", (req, res) => {
+    let board = req.params.board;
+    res.send(createTask.replaceAll("TOBESPECIFIEDID", board));
+});
+
+// Board Route
 app.get("/page/board/:board", (req, res) => {
     let board = req.params.board;
-    res.send("Board "+board);
-    // TO be continued
+    db.all("select * from Board WHERE id="+board+";", (err, rows) => {
+        if(err){
+            console.log(err);
+            res.send(err);
+            return;
+        }else {
+            res.send(boardMainView.replaceAll("TOBESPECIFIEDID", board).replaceAll("TOBESPECIFIEDNAME", rows[0].name).replaceAll("TOBESPECIFIEDDESC", rows[0].beschreibung));
+        }
+    })
 });
 
 // Create Mitarbeiter
@@ -217,11 +233,19 @@ app.post("/createAufgabe", (req, res) => {
         });
 
         function createMsg(){
-            res.send("Created "+req.body.name);
+            db.all("select id from Aufgabe WHERE name = '"+req.body.name+"' AND mitarbeiter = "+req.body.mitarbeiter+" ORDER BY id DESC LIMIT 1;", (err, rows) => {
+                if(err){
+                    console.log(err);
+                    res.send("Error");
+                    return;
+                }else {
+                    res.send({id:rows[0].id});
+                }
+            })
         }
 
         if(req.body.beschreibung == undefined){
-            db.exec("insert into Aufgabe (name, mitarbeiter, status) values ('"+req.body.name+"', "+mitarbeiter+", 'To DO');", (err) => {
+            db.exec("insert into Aufgabe (name, mitarbeiter, status) values ('"+req.body.name+"', "+mitarbeiter+", 'todo');", (err) => {
                 if(err){
                     console.log(err);
                     res.send("Error");
@@ -230,7 +254,7 @@ app.post("/createAufgabe", (req, res) => {
                 createMsg();
             });
         }else{
-            db.exec("insert into Aufgabe (name, beschreibung, mitarbeiter, status) values ('"+req.body.name+"', '"+req.body.beschreibung+"', "+mitarbeiter+", 'To DO');", (err)=> {
+            db.exec("insert into Aufgabe (name, beschreibung, mitarbeiter, status) values ('"+req.body.name+"', '"+req.body.beschreibung+"', "+mitarbeiter+", 'todo');", (err)=> {
                 if(err){
                     console.log(err);
                     res.send("Error");
@@ -254,30 +278,31 @@ app.post("/addAufgabeToBoard", (req, res) => {
             res.send("Error: "+err);
             return;
         }
-        db.all("select name from aufgabe where id = "+aufgabe, (err, rows) => {
-            if(err){
-                console.log(err);
-                res.send("Error: "+err);
-                return;
-            }
+        res.send("DONE");
+        // db.all("select name from Aufgabe where id = "+aufgabe, (err, rows) => {
+        //     if(err){
+        //         console.log(err);
+        //         res.send("Error: "+err);
+        //         return;
+        //     }
             
-            rows.forEach((row) => {
-                aufgabeName = row;
-            });
+        //     rows.forEach((row) => {
+        //         aufgabeName = row;
+        //     });
 
-            db.all("select name from board where id = "+board, (err, rows) => {
-                if(err){
-                    console.log(err);
-                    res.send("Error: "+err);
-                    return;
-                }
-                rows.forEach((row) => {
-                    boardName = row;
-                })
+        //     db.all("select name from board where id = "+board, (err, rows) => {
+        //         if(err){
+        //             console.log(err);
+        //             res.send("Error: "+err);
+        //             return;
+        //         }
+        //         rows.forEach((row) => {
+        //             boardName = row;
+        //         })
                 
-                res.send("Added "+aufgabeName+" to "+boardName);
-            });
-        });
+        //         res.send("Added "+aufgabeName+" to "+boardName);
+        //     });
+        // });
         
     });
 });
@@ -382,12 +407,22 @@ app.listen(port, () => {
 
 
 //DEBUG
-db.all("select * from Board;", (err, rows) => {
-    rows.forEach((row) => {
-        console.log(row);
-    })
-})
-db.all("select * from Board_Mitarbeiter;", (err, rows) => {
+
+// db.all("select * from Board;", (err, rows) => {
+//     rows.forEach((row) => {
+//         console.log(row);
+//     })
+// })
+// db.all("select * from Board_Mitarbeiter;", (err, rows) => {
+//     rows.forEach((row) => {
+//         console.log(row);
+//     })
+// })
+db.all("select * from Aufgabe;", (err, rows) => {
+    if(err){
+        console.log(err);
+        return;
+    }
     rows.forEach((row) => {
         console.log(row);
     })
