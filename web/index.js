@@ -1,4 +1,4 @@
-
+// Get the Boards
 if(localStorage.getItem("id") != undefined){
     $.ajax({url:"/boards?mitarbeiter="+localStorage.getItem("id")})
     .done((data) => {
@@ -17,3 +17,9 @@ if(localStorage.getItem("id") != undefined){
         });
     });
 }
+
+// Logoutbutton
+$("#logoutbutton").on("click", ()=>{
+    localStorage.clear();
+    window.location.href="/page/login";
+});

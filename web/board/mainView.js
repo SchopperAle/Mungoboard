@@ -8,7 +8,7 @@ $.ajax({url: "/aufgaben?board="+document.body.getAttribute("data-id")})
     console.log(data);
     data.forEach((val) => {
         $("#"+val.status).html($("#"+val.status).html()+
-            "<div class=\"task\" id=\""+val.id+"\" draggable=\"true\" ondragstart=\"drag(event)\"><span>"+val.name+"</span></div>"
+            "<div class=\"task\" id=\""+val.id+"\" draggable=\"true\" ondragstart=\"drag(event)\">"+val.name+"</div>"
         );
     });
 });
@@ -24,7 +24,9 @@ function allowDrop(ev) {
 function drop(ev) {
     ev.preventDefault();
     let data = ev.dataTransfer.getData("text");
-    ev.target.appendChild(document.getElementById(data));
-    let status = ev.target.id==undefined?ev.target.parentNode.getAttribute("id"):ev.target.getAttribute("id");
+    let status = ev.target.classList[0] == "task"?ev.target.parentNode.getAttribute("id"):ev.target.getAttribute("id");
+    document.getElementById(status).appendChild(document.getElementById(data));
+
+    // console.log(status)
     $.ajax({url: "/setStatus", type:"POST", data:{aufgabe:data, status:status}})
 }
