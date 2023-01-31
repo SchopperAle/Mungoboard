@@ -1,6 +1,7 @@
 body {
     margin: 0;
     font-family: arial, Helvetica, sans-serif;
+    overflow-x: hidden;
 }
 
 header {
@@ -42,7 +43,7 @@ header {
     height: 3vw;
 }
 
-.boardName{
+#projectName{
     text-align: center;
     font-style: italic;
 }
@@ -84,3 +85,69 @@ header {
     display: inline;
 }
 
+
+#viewAufgabe{
+    position: fixed;
+    height: 80vh;
+    width: 80vw;
+    top:10vh;
+    left:10vw;
+    background-color: #E5BA73;
+    color:black;
+    border-radius: 2em;
+    border: black 2px solid;
+    display: none;
+}
+
+#aName{
+    text-align: center;
+    font-weight: bolder;
+    font-size: xx-large;
+    user-select: none;
+    padding: 2vh;
+}
+
+#aBeschreibung{
+    border: 2px black solid;
+    width: 80%;
+    left: 10%;
+    height: 50%;
+    overflow-y: auto;
+    position: relative;
+    padding: 3px;
+    user-select: none;
+    background-color: white;
+}
+
+#aMitarbeiter, #aStatus {
+    position: relative;
+    left: 10%;
+    user-select: none;
+}
+
+#aEdit{
+    background-color: white;
+    border: 2px black solid;
+    padding: 2vh;
+    left: 85%;
+    top: 15%;
+    position: relative;
+    width: fit-content;
+    user-select: none;
+}
+
+#aEdit:hover{
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+#blankScreen{
+    display: none;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top:0px;
+    left:0px;
+    background-color: white;
+    opacity: 0.5;
+}

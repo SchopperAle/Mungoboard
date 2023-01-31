@@ -1,6 +1,6 @@
 // Speichert den Task
 function saveTask(){
-    $.ajax({url: "/createAufgabe", type:"POST", data:{mitarbeiter:1, name:$("#TaskName").val(), beschreibung:$("#TaskBeschreibung").val()}})
+    $.ajax({url: "/createAufgabe", type:"POST", data:{mitarbeiter:1, name:$("#TaskName").val(), beschreibung:$("#TaskBeschreibung").val().replaceAll("\n", "<br>")}})
     .done((data) => {
         console.log(data);
         $.ajax({url: "/addAufgabeToBoard", type:"POST", data:{

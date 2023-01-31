@@ -73,7 +73,6 @@ let createTask = ""+ fs.readFileSync("./web/board/createTask.html");
 // Default Route
 app.get("/", (req, res) => {
     res.sendFile(__dirname+"/web/board/createBoard.html");
-    // res.sendFile(__dirname+"/web/index.html");
 });
 
 // Profile Route
@@ -279,31 +278,6 @@ app.post("/addAufgabeToBoard", (req, res) => {
             return;
         }
         res.send("DONE");
-        // db.all("select name from Aufgabe where id = "+aufgabe, (err, rows) => {
-        //     if(err){
-        //         console.log(err);
-        //         res.send("Error: "+err);
-        //         return;
-        //     }
-            
-        //     rows.forEach((row) => {
-        //         aufgabeName = row;
-        //     });
-
-        //     db.all("select name from board where id = "+board, (err, rows) => {
-        //         if(err){
-        //             console.log(err);
-        //             res.send("Error: "+err);
-        //             return;
-        //         }
-        //         rows.forEach((row) => {
-        //             boardName = row;
-        //         })
-                
-        //         res.send("Added "+aufgabeName+" to "+boardName);
-        //     });
-        // });
-        
     });
 });
 
@@ -377,6 +351,29 @@ app.post("/updateAufgabe", (req, res) => {
 
         res.send("Aufgabe Bearbeitet.");
     });
+});
+
+// Aufgabe löschen
+app.post("/deleteAufgabe", (req, res) => {
+    let id = req.body.id;
+
+    db.exec("DELETE FROM Aufgabe_Board WHERE aufgabe="+id+";", (err) => {
+        if(err){
+            console.log(err);
+            res.send("ERROR: "+err);
+            return;
+        }else {
+            db.exec("DELETE FROM Aufgabe WHERE id="+id+";", (err) => {
+                if(err){
+                    console.log(err);
+                    res.send("Error: "+err);
+                    return;
+                }else {
+                    res.send("Deleted.");
+                }
+            });
+        }
+    })
 });
 
 // Login

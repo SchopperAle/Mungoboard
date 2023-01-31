@@ -9,7 +9,7 @@
 <body data-id="TOBESPECIFIEDID" data-name="TOBESPECIFIEDNAME" data-desc="TOBESPECIFIEDDESC">
 <header id="header">
     <a href="/">MungoBoard</a>
-    <div class="boardName" id="projectName">Projektname</div>
+    <div id="projectName">TOBESPECIFIEDNAME</div>
     <div>
         <a href="./TOBESPECIFIEDID/createTask"><img id="newTask" src="/web/images/icon_newTask.png" alt="createTask" onclick="clickSettings();"></a>
         <img id="downloadAsPDF" src="/web/images/icon_savePDF.png" alt="saveAsPDF" onclick="clickSettings();">
@@ -18,22 +18,29 @@
     </div>
 </header>
 
-
 <div class="container">
     <div class="scrum-board">
         <div class="board-block" id="todo" ondrop="drop(event)" ondragover="allowDrop(event)">
             To Do
         </div>
-    <div class="board-block" id="inprogress" ondrop="drop(event)" ondragover="allowDrop(event)">
-        In Progress
-    </div>
-    <div class="board-block" id="review" ondrop="drop(event)" ondragover="allowDrop(event)">
-        Review
-    </div>
-    <div class="board-block" id="done" ondrop="drop(event)" ondragover="allowDrop(event)">
-        Done
+        <div class="board-block" id="inprogress" ondrop="drop(event)" ondragover="allowDrop(event)">
+            In Progress
+        </div>
+        <div class="board-block" id="review" ondrop="drop(event)" ondragover="allowDrop(event)">
+            Review
+        </div>
+        <div class="board-block" id="done" ondrop="drop(event)" ondragover="allowDrop(event)">
+            Done
+        </div>
     </div>
 </div>
+<div id="blankScreen" onclick="hideViewAufgabe()"></div>
+<div id="viewAufgabe">
+    <div id="aName">Aufgabe 1</div>
+    <div id="aBeschreibung">Dings Wurzel...</div>
+    <div id="aMitarbeiter">Mitarbeiter: Hans Wurscht</div>
+    <div id="aStatus">Status: DONE</div>
+    <div id="aEdit">Edit</div>
 </div>
 
 <script src="/web/board/mainView.js"></script>
