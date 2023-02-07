@@ -1,3 +1,4 @@
+/* Allgemeine CSS-Datei */
 body {
     margin: 0;
     font-family: arial, Helvetica, sans-serif;
@@ -12,7 +13,6 @@ header {
     font-size: 2.5vw;
 }
 
-/* Add styling for the buttons in the header */
 #header img {
     border: none;
     padding: 5px 10px;

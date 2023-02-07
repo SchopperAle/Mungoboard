@@ -18,7 +18,7 @@ if(localStorage.getItem("id") != undefined){
     });
 }
 
-// Logoutbutton
+// Logout-Handler
 $("#logoutbutton").on("click", ()=>{
     localStorage.clear();
     window.location.href="/page/login";

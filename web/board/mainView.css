@@ -1,3 +1,5 @@
+/* CSS für die Board-View */
+
 body {
     margin: 0;
     font-family: arial, Helvetica, sans-serif;
@@ -13,7 +15,6 @@ header {
     font-size: 2.5vw;
 }
 
-/* Add styling for the buttons in the header */
 #header img {
     border: none;
     padding: 5px 10px;
@@ -125,7 +126,7 @@ header {
     user-select: none;
 }
 
-#aEdit, #aSave{
+#aEdit, #aSave, #aDelete{
     background-color: white;
     border: 2px black solid;
     padding: 2vh;
@@ -136,7 +137,7 @@ header {
     user-select: none;
 }
 
-#aEdit:hover, #aSave{
+#aEdit:hover, #aSave:hover, #aDelete:hover{
     cursor: pointer;
     opacity: 0.8;
 }
@@ -150,4 +151,14 @@ header {
     left:0px;
     background-color: white;
     opacity: 0.5;
+}
+
+#aDelete{
+    padding: 1vh;
+    left:15%;
+    top:7%;
+}
+
+#aDelete img {
+    width: 2.5vw;
 }

@@ -1,3 +1,4 @@
+// Login - WIP
 function login(){
     let name = $("#name").val();
     $.ajax({url:"/login", type:"POST", data:{name:name}})
@@ -12,6 +13,7 @@ function login(){
         })
 }
 
+// Event-Listener -> Führt bei Enter-Klick zum Login
 addEventListener("keypress", (ev) => {
     if(ev.key == "Enter"){
         $("#loginButton").trigger("click");

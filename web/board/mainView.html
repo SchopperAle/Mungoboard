@@ -1,9 +1,11 @@
 <!DOCTYPE html>
+<!-- Board-View -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <title>Mungoboard</title>
     <link rel="stylesheet" href="/web/board/mainView.css">
+    <link rel="shortcut icon" href="/web/images/favicon.ico" type="image/x-icon">
     <script src="/jquery.js"></script>
 </head>
 <body data-id="TOBESPECIFIEDID" data-name="TOBESPECIFIEDNAME" data-desc="TOBESPECIFIEDDESC">
@@ -42,6 +44,7 @@
     <div id="aStatus">Status: DONE</div>
     <div id="aEdit" onclick="enableEdit()">Edit</div>
     <div id="aSave" onclick="saveChanges()">Save</div>
+    <div id="aDelete" onclick="deleteTask()"><img src="/web/images/icon_delete.png" alt="Löschen"></div>
 </div>
 
 <script src="/web/board/mainView.js"></script>

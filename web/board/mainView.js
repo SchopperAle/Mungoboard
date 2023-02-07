@@ -1,4 +1,4 @@
-// Load Tasks
+// Aufgaben laden
 $.ajax({url: "/aufgaben?board="+document.body.getAttribute("data-id")})
 .done((data)=>{
     console.log(data);
@@ -9,14 +9,17 @@ $.ajax({url: "/aufgaben?board="+document.body.getAttribute("data-id")})
     });
 });
 
+// Drag-Eventhandler für die Aufgaben
 function drag(ev) {
     ev.dataTransfer.setData("text", ev.target.id);
 }
 
+// Erlaubt Drop über die Kategorien
 function allowDrop(ev) {
     ev.preventDefault();
 }
 
+// Drop-Eventhandler für den Status der Aufgaben
 function drop(ev) {
     ev.preventDefault();
     let data = ev.dataTransfer.getData("text");
@@ -26,11 +29,13 @@ function drop(ev) {
     $.ajax({url: "/setStatus", type:"POST", data:{aufgabe:data, status:status}})
 }
 
+// Double-Click Eventhandler (für Task)
 function dblClicked(ev) {
     ev.preventDefault();
     showTask(ev.target);
 }
 
+// Task anzeigen
 function showTask(taskOBJ){
     $.ajax({url:"/aufgabe?aufgabe="+taskOBJ.id})
     .done((data) => {
@@ -50,6 +55,8 @@ function showTask(taskOBJ){
 function hideViewAufgabe(){
     $("#blankScreen").hide();
     $("#viewAufgabe").hide(200);
+    $("#aSave").hide();
+    $("#aEdit").show();
 }
 
 // Das Save-Feld fürs Bearbeiten unsichbar machen
@@ -77,7 +84,18 @@ function saveChanges(){
             $("#aEdit").show();
             $("#aName").attr("contenteditable", "false");
             $("#aBeschreibung").attr("contenteditable", "false");
+            $("#"+$("#aName").attr("data-id")).html($("#aName").html());
         }
         alert(data);
     });
+}
+
+// Aufgabe löschen
+function deleteTask(){
+    $.ajax({url:"/deleteAufgabe", type:"POST", data:{id:$("#aName").attr("data-id")}})
+    .done((data) => {
+        hideViewAufgabe();
+        $("#"+$("#aName").attr("data-id")).hide();
+        alert(data);
+    })
 }
