@@ -8,7 +8,9 @@
     <link rel="shortcut icon" href="/web/images/favicon.ico" type="image/x-icon">
     <script src="/jquery.js"></script>
 </head>
+<!-- data-id: Board-ID, data-name: Board-Name, data-desc: Board-Beschreibung -->
 <body data-id="TOBESPECIFIEDID" data-name="TOBESPECIFIEDNAME" data-desc="TOBESPECIFIEDDESC">
+<!-- Nav-Bar -->
 <header id="header">
     <a href="/">MungoBoard</a>
     <div id="projectName">TOBESPECIFIEDNAME</div>
@@ -20,6 +22,7 @@
     </div>
 </header>
 
+<!-- Spalten -->
 <div class="container">
     <div class="scrum-board">
         <div class="board-block" id="todo" ondrop="drop(event)" ondragover="allowDrop(event)">
@@ -36,7 +39,11 @@
         </div>
     </div>
 </div>
+
+<!-- "Feld" zum schließen der Aufgabe -->
 <div id="blankScreen" onclick="hideViewAufgabe()"></div>
+
+<!-- Zum Aufgabe anzeigen / bearbeiten / löschen -->
 <div id="viewAufgabe">
     <div id="aName">Aufgabe 1</div>
     <div id="aBeschreibung">Dings Wurzel...</div>
