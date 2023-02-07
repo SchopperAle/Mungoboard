@@ -40,12 +40,44 @@ function showTask(taskOBJ){
         $("#aBeschreibung").html(data.beschreibung);
         $("#aMitarbeiter").html("Mitarbeiter: WIP-"+data.mitarbeiter);
         $("#aStatus").html("Status: "+data.status);
+        $("#aStatus").attr("data-status",data.status);
         $("#blankScreen").show();
         $("#viewAufgabe").show(200);
     });
 }
 
+// Die Aufgaben-View unsichbar machen
 function hideViewAufgabe(){
     $("#blankScreen").hide();
     $("#viewAufgabe").hide(200);
+}
+
+// Das Save-Feld fürs Bearbeiten unsichbar machen
+$("#aSave").hide();
+
+// Bearbeiten ermöglichen
+function enableEdit(){
+    $("#aName").attr("contenteditable", "true");
+    $("#aBeschreibung").attr("contenteditable", "true");
+    $("#aSave").show();
+    $("#aEdit").hide();
+}
+
+// Zum speichern der Änderungen
+function saveChanges(){
+    $.ajax({url:"/updateAufgabe", type:"POST", data:{
+        id: $("#aName").attr("data-id"),
+        name: $("#aName").html(),
+        beschreibung: $("#aBeschreibung").html().replaceAll("\n", "<br>"),
+        mitarbeiter: 1, // Platzhalter
+        status: $("#aStatus").attr("data-status")
+    }}).done((data) => {
+        if(data == "Aufgabe Bearbeitet."){
+            $("#aSave").hide();
+            $("#aEdit").show();
+            $("#aName").attr("contenteditable", "false");
+            $("#aBeschreibung").attr("contenteditable", "false");
+        }
+        alert(data);
+    });
 }

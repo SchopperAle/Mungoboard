@@ -342,7 +342,7 @@ app.post("/updateAufgabe", (req, res) => {
     let mitarbeiter = req.body.mitarbeiter;
     let status = req.body.status;
 
-    db.exec("UPDATE Mitarbeiter SET name = '"+name+"', beschreibung='"+beschreibung+"', mitarbeiter="+mitarbeiter+", status='"+status+"' WHERE id = "+id, (err) => {
+    db.exec("UPDATE Aufgabe SET name = '"+name+"', beschreibung='"+beschreibung+"', mitarbeiter="+mitarbeiter+", status='"+status+"' WHERE id = "+id, (err) => {
         if(err){
             console.log(err);
             res.send("ERROR: "+err);
