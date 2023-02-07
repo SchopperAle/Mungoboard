@@ -1,5 +1,9 @@
 // Speichert den Task
 function saveTask(){
+    if($("#TaskName").val()==undefined ||$("#TaskName").val()==""){
+        alert("Name fehlt!");
+        return;
+    }
     $.ajax({url: "/createAufgabe", type:"POST", data:{
         mitarbeiter:1, 
         name:$("#TaskName").val(), 
