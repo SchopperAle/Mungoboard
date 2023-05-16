@@ -3,6 +3,7 @@ let sqlite = require("sqlite3");            //Datenbank
 let express = require("express");           //Webserver
 let fs = require("fs");                     //File-System
 let bodyParser = require('body-parser');    //Post-verschlüsselung
+const muna = require("./backend/munadb");   //Datenbank mit extra Funktionen
 
 // Einstellungen von Datei laden
 let settings = JSON.parse(fs.readFileSync("./settings.json")+"");
@@ -19,6 +20,8 @@ let db = new sqlite.Database("./backend/"+dbname, (err)=> {
 
     createDB(); // Datenbank erstellen
 });
+
+muna.setDB(db);
 
 // Tables der Datenbank erstellen
 function createDB(){
@@ -107,326 +110,192 @@ app.get("/page/board/:board/createTask", (req, res) => {
 });
 
 // Board Route
-app.get("/page/board/:board", (req, res) => {
+app.get("/page/board/:board", async (req, res) => {
     let board = req.params.board;
     // Board auswählen
-    db.all("select * from Board WHERE id="+board+";", (err, rows) => {
+    let row = await muna.get("select * from Board WHERE id=?", board);
 
-        if(err){ // Fehler
-            console.log(err);
-            res.status(500).send(err);
-            return;
-        }else {
-            if(rows[0] == undefined){   // Kein Board mit der ID gefunden
-                console.log("Warning: Board "+board+" existiert nicht.");
-                res.status(451).sendFile(__dirname+"/web/images/gefährlich.png");
-                return;
-            }
+    if (muna.checkError(row, res, "Board wurde nicht gefunden", 404)) return;
 
-            // Pre-geloadetes Template verändern und senden
-            res.send(
-                boardMainView.replaceAll("TOBESPECIFIEDID", board)      // Board-ID
-                .replaceAll("TOBESPECIFIEDNAME", rows[0].name)          // Board-Name
-                .replaceAll("TOBESPECIFIEDDESC", rows[0].beschreibung)  // Board-Beschreibung
-            );
-        }
-    })
+    // Pre-geloadetes Template verändern und senden
+    res.send(
+        boardMainView.replaceAll("TOBESPECIFIEDID", board)      // Board-ID
+        .replaceAll("TOBESPECIFIEDNAME", row.name)          // Board-Name
+        .replaceAll("TOBESPECIFIEDDESC", row.beschreibung)  // Board-Beschreibung
+    );
 });
 
 // Create Mitarbeiter - WIP
-app.post("/createMitarbeiter", (req, res) => {
+app.post("/createMitarbeiter", async(req, res) => {
     // Mitarbeiter anlegen
-    db.exec("insert into Mitarbeiter (name) values ('"+ req.body.name +"');", (err) => {
-        
-        if(err){    // FEHLER!
-            console.log(err);
-            res.status(500).send("Error: Could not create "+req.body.name);
-            return;
-        }else {
-            
-            // Statusmeldung senden
-            res.send("Created "+req.body.name);
-        }
-    });
+    let row = await muna.exec("insert into Mitarbeiter (name) values (?)", req.body.name);
+    if (muna.checkError(row, res, "Could not create "+req.body.name)) return;
+    res.send("Created "+req.body.name);
 });
 
 // Create Board
-app.post("/createBoard", (req, res) => {
+// Prepare Statement
+let createBoardStatement = muna.prepare("insert into Board (name, beschreibung) values (?, ?)");
+app.post("/createBoard", async (req, res) => {
 
     // Funktion zum senden der BoardID, bei Erstellung -> Für addMitarbeiterToBoard
-    function sendId(){
-        db.all("select id from Board WHERE name LIKE '"+req.body.name+"' ORDER BY id DESC;", (err, rows) => {
-            if(err){
-                console.log(err);
-                res.send("Error: "+err);
-                return;
-            }
+    const sendId = async() => {
+        let row = await muna.get("select id from Board WHERE name LIKE ? ORDER BY id DESC", req.body.name);
+        if (muna.checkError(row, res)) return;
 
-            res.send(rows[0]);
-        })
+        res.send(row);
     }
+    
+    // Board erstellen
+    createBoardStatement.bind(req.body.name, req.body.beschreibung == ''? undefined : req.body.beschreibung);
+    let row = muna.runPrepared(createBoardStatement);
+    if (muna.checkError(row, res)) return;
 
-    // Leere Beschreibung
-    if(req.body.beschreibung == undefined || req.body.beschreibung == ""){
-        // Board erstellen ohne Beschreibung
-        db.exec("insert into Board (name) values ('"+req.body.name+"');", (err) => {
-            if(err){    // FEHLER
-                console.log(err);
-                res.status(500).send("Error: Could not create "+req.body.name);
-                return;
-            }
-            sendId();   //Id senden
-        });
-    }
-    // Keine leere Beschreibung
-    else {
-        // Board erstellen mit Beschreibung
-        db.exec("insert into Board (name, beschreibung) values ('"+req.body.name+"','"+req.body.beschreibung+"');", (err) => {
-            if(err){    //FEHLER
-                console.log(err);
-                res.status(500).send("Error: Could not create "+req.body.name);
-                return;
-            }
-            sendId();   //Id senden
-        });
-    }
+    sendId();   //Id senden
 });
 
 //Get boards
-app.get("/boards", (req, res) => {
+app.get("/boards", async (req, res) => {
     // Boards von der Datenbank holen
-    db.all("select * from Mitarbeiter m INNER JOIN Board_Mitarbeiter bm ON bm.mitarbeiter = m.id INNER JOIN Board b ON b.id = bm.board WHERE m.id = '"+req.query.mitarbeiter+"' ORDER BY b.id DESC;", (err, rows) => {
-        if(err){    //FEHLER
-            console.log(err);
-            res.status(500).send("Error loading Boards");
-            return;
-        }
-
-        // Boards senden
-        res.send({data: rows});
-    });
+    let rows = await muna.all("select * from Mitarbeiter m INNER JOIN Board_Mitarbeiter bm ON bm.mitarbeiter = m.id INNER JOIN Board b ON b.id = bm.board WHERE m.id = ? ORDER BY b.id DESC;", req.query.mitarbeiter);
+    if (muna.checkError(rows, res, "Error loading Boards")) return;
+    // Boards senden
+    res.send({data: rows});
 });
 
 //Add Mitarbeiter to Board
-app.post("/addMitarbeiterToBoard", (req, res) => {
+//Prepared Statement für Link
+let linkBoardMitarbeiterStatement = muna.prepare("insert into Board_Mitarbeiter (board, mitarbeiter) values (?, ?)");
+app.post("/addMitarbeiterToBoard", async (req, res) => {
     let id, boardId;
     let name, boardName;
-    
-    // Mitarbeiter-Daten holen.
-    db.all("select * from Mitarbeiter m WHERE m.id = '"+req.body.mitarbeiter+"';", (err, rows) => {
-        if(err){    //FEHLER
-            console.log(err);
-            res.status(500).send("Error");
-            return;
-        }
 
-        // Mitarbeiter-Daten temporär speichern
-        rows.forEach((row) => {
-            id = row.id;
-            name = row.name;
-        })
+    // Mitarbeiterdaten holen
+    let row = await muna.get("select * from Mitarbeiter m WHERE m.id = ?", req.body.mitarbeiter);
+    if (muna.checkError(row, res)) return;
+    id = row.id;
+    name = row.name;
 
-        // Board-Daten holen
-        db.all("select * from Board b WHERE b.id = '"+req.body.board+"';", (err, rows) => {
-            if(err){    //FEHLER
-                console.log(err);
-                res.status(500).send("ERROR");
-                return;
-            }
-    
-            // Board-Daten temporär speichern
-            rows.forEach((row) => {
-                boardId = row.id;
-                boardName = row.name;
-            });
+    // Boarddaten holen
+    row = await muna.get("select * from Board b WHERE b.id = ?", req.body.board);
+    if (muna.checkError(row, res)) return;
+    boardId = row.id;
+    boardName = row.name;
 
-            // Board-Mitarbeiter-Link erstellen
-            db.exec("insert into Board_Mitarbeiter (board, mitarbeiter) values ("+boardId+", "+id+")", (err) => {
-                if(err){ // FEHLER
-                    console.log(err);
-                    res.status(500).send(err);
-                    return;
-                }else {
-                    // Schöne Bestätigungsnachricht schicken 
-                    res.send("Added "+name+" to "+boardName);
-                }
-            });
-        });
-    });
+    // Linken
+    linkBoardMitarbeiterStatement.bind(boardId, id);
+    row = await muna.runPrepared(linkBoardMitarbeiterStatement);
+    if (muna.checkError(row, res)) return;
+
+    // Nachricht senden
+    res.send("Added "+name+" to "+boardName);
 });
 
 // Create Aufgabe
-app.post("/createAufgabe", (req, res) => {
-    let mitarbeiter = req.body.mitarbeiter;
-
+// Create Aufgabe Prepared Statement
+let createAufgabeStatement = muna.prepare("insert into Aufgabe (name, beschreibung, mitarbeiter, status) values (?, ?, ?, 'todo')");
+app.post("/createAufgabe", async (req, res) => {
+    // Aufgabe erstellen
+    req.body.mitarbeiter = parseInt(req.body.mitarbeiter);
+    createAufgabeStatement.bind(req.body.name, req.body.beschreibung, req.body.mitarbeiter);
+    let row = await muna.runPrepared(createAufgabeStatement);
+    if (muna.checkError(row, res)) return;
+    
     // Nachricht bei erfolgreichem Erstellen der Aufgabe (id für Link zum Board)
-    function createMsg(){
-        db.all("select id from Aufgabe WHERE name = '"+req.body.name+"' AND mitarbeiter = "+req.body.mitarbeiter+" ORDER BY id DESC LIMIT 1;", (err, rows) => {
-            if(err){    // FEHLER
-                console.log(err);
-                res.status(500).send("Error");
-                return;
-            }else {
-                res.send({id:rows[0].id});
-            }
-        })
-    }
-
-    // Leere Beschreibung
-    if(req.body.beschreibung == undefined){
-        // Aufgabe erstellen
-        db.exec("insert into Aufgabe (name, mitarbeiter, status) values ('"+req.body.name+"', "+mitarbeiter+", 'todo');", (err) => {
-            if(err){    //FEHLER
-                console.log(err);
-                res.status(500).send("Error");
-                return;
-            }
-            // Create-Nachricht senden
-            createMsg();
-        });
-    }
-    // Keine leere Beschreibung
-    else{
-        // Aufgabe erstellen
-        db.exec("insert into Aufgabe (name, beschreibung, mitarbeiter, status) values ('"+req.body.name+"', '"+req.body.beschreibung+"', "+mitarbeiter+", 'todo');", (err)=> {
-            if(err){    //FEHLER
-                console.log(err);
-                res.status(500).send("Error");
-                return;
-            }
-            // Create-Nachricht senden
-            createMsg();
-        });
-    }
+    row = await muna.get("select id from Aufgabe WHERE name = ? AND mitarbeiter = ? ORDER BY id DESC", [req.body.name, req.body.mitarbeiter]);
+    if (muna.checkError(row, res)) return;
+    res.send({id:row.id});
 });
 
 // Add Aufgabe to Board
-app.post("/addAufgabeToBoard", (req, res) => {
-    let aufgabe, board;
-    aufgabe = req.body.aufgabe;
-    board = req.body.board;
-
+// Link Aufgabe Board Statement
+let aufgabeBoardStatement = muna.prepare("insert into Aufgabe_Board (aufgabe, board) values (?, ?)");
+app.post("/addAufgabeToBoard", async (req, res) => {
     // Aufgabe-Board-Link erstellen
-    db.exec("insert into Aufgabe_Board (aufgabe, board) values ("+aufgabe+", "+board+");", (err) => {
-        if(err){    //FEHLER
-            console.log(err);
-            res.status(500).send("Error: "+err);
-            return;
-        }
-        // Erfolgsnachricht
-        res.send("DONE");
-    });
+    aufgabeBoardStatement.bind(req.body.aufgabe, req.body.board);
+    let row = await muna.runPrepared(aufgabeBoardStatement);
+    if (muna.checkError(row, res)) return;
+    
+    res.send("DONE");
 });
 
 // Get Aufgaben (alle eines Boards)
-app.get("/aufgaben", (req,res) => {
-    let board = req.query.board;
+app.get("/aufgaben", async (req,res) => {
     let aufgaben = [];
 
     // Alle Aufgaben des Boards laden
-    db.all("select * from Aufgabe a INNER JOIN Aufgabe_Board ab ON a.id = ab.aufgabe WHERE ab.board = "+board+";", (err, rows) => {
-        if(err){    //FEHLER
-            console.log(err);
-            res.status(500).send([]);
-            return;
-        }
+    let rows = await muna.all("select * from Aufgabe a INNER JOIN Aufgabe_Board ab ON a.id = ab.aufgabe WHERE ab.board = ?", [req.query.board]);
+    if (muna.checkError(rows, res, [])) return;
 
-        // Aufgaben verpacken und im array speichern
-        rows.forEach((row) => {
-            aufgaben.push({id:row.id, name:row.name, mitarbeiter:row.mitarbeiter, status:row.status});
-        });
-
-        // Array versenden
-        res.send(aufgaben);
+    // Aufgaben verpacken und im array speichern
+    rows.forEach((row) => {
+        aufgaben.push({id:row.id, name:row.name, mitarbeiter:row.mitarbeiter, status:row.status});
     });
+
+    // Array versenden
+    res.send(aufgaben);
 });
 
 // Get Aufgabe genau
-app.get("/aufgabe", (req, res) => {
-    let aufgabe = req.query.aufgabe;
-
+app.get("/aufgabe", async (req, res) => {
     // Aufgabe laden
-    db.all("select * from aufgabe WHERE id = "+aufgabe+";", (err, rows) => {
-        if(err){    //FEHLER
-            console.log(err);
-            res.status(500).send("Error: "+err);
-            return;
-        }
+    let row = await muna.get("select * from aufgabe WHERE id = ?", req.query.aufgabe);
+    if(muna.checkError(row, res)) return;
 
-        if(rows[0] == undefined){   //Aufgabe existiert nicht
-            console.log("Warning: Aufgabe "+aufgabe+" existiert nicht.");
-            res.status(451).send("Aufgabe existiert nicht ;(");
-            return;
-        }
-        // Aufgabe senden
-        res.send({id:rows[0].id, name:rows[0].name, mitarbeiter:rows[0].mitarbeiter, status:rows[0].status, beschreibung:rows[0].beschreibung});
-        
-    });
+    // Aufgabe existiert nicht
+    if(row == undefined){
+        console.log("Warning: Aufgabe "+req.query.aufgabe+" existiert nicht.");
+        res.status(451).send("Aufgabe existiert nicht ;(");
+    }
+
+    // Aufgabe senden
+    res.send({id:row.id, name:row.name, mitarbeiter:row.mitarbeiter, status:row.status, beschreibung:row.beschreibung});
 });
 
 // Set Aufgabe Status
-app.post("/setStatus", (req, res) => {
-    let aufgabe = req.body.aufgabe;
-    let status = req.body.status;
-
+// Update Status Statement
+let updateStatusStatement = muna.prepare("update Aufgabe SET status = ? WHERE id = ?");
+app.post("/setStatus", async (req, res) => {
     // Status der Aufgabe updaten
-    db.exec("update Aufgabe SET status = '"+status+"' WHERE id = "+aufgabe, (err) => {
-        if(err){    // FEHLER
-            console.log(err);
-            res.status(500).send("ERROR: "+err);
-            return;
-        }
+    updateStatusStatement.bind(req.body.status, req.body.aufgabe);
+    let row = await muna.runPrepared(updateStatusStatement);
+    if(muna.checkError(row, res)) return;
 
-        // Benachrichtigung senden
-        res.send("Set Status to "+status);
-    });
+    // Status senden
+    res.send("Set Status to "+req.body.status);
 });
 
 // Aufgabe Bearbeiten
-app.post("/updateAufgabe", (req, res) => {
-    let id = req.body.id;
-    let name = req.body.name;
-    let beschreibung = req.body.beschreibung;
-    let mitarbeiter = req.body.mitarbeiter;
-    let status = req.body.status;
-
+// Update Aufgabe Statement
+let updateAufgabeStatement = muna.prepare("UPDATE Aufgabe SET name = ?, beschreibung=?, mitarbeiter=?, status=? WHERE id = ?");
+app.post("/updateAufgabe", async (req, res) => {
     // Aufgabe Bearbeiten
-    db.exec("UPDATE Aufgabe SET name = '"+name+"', beschreibung='"+beschreibung+"', mitarbeiter="+mitarbeiter+", status='"+status+"' WHERE id = "+id, (err) => {
-        if(err){
-            console.log(err);
-            res.send("ERROR: "+err);
-            return;
-        }
-
-        // Erfolgsbestätigung senden
-        res.send("Aufgabe Bearbeitet.");
-    });
+    updateAufgabeStatement.bind(req.body.name, req.body.beschreibung, req.body.mitarbeiter, req.body.status, req.body.id);
+    let row = await muna.runPrepared(updateAufgabeStatement);
+    if(muna.checkError(row, res)) return;
+    
+    // Erfolgsbestätigung senden
+    res.send("Aufgabe Bearbeitet.");
 });
 
 // Aufgabe löschen
-app.post("/deleteAufgabe", (req, res) => {
-    let id = req.body.id;
-
+// Delete Link Aufgabe_Board Statement
+let deleteLinkAufgabeBoardStatement = muna.prepare("DELETE FROM Aufgabe_Board WHERE aufgabe=?");
+// Delete Aufgabee Statement
+let deleteAufgabeStatement = muna.prepare("DELETE FROM Aufgabe WHERE id=?");
+app.post("/deleteAufgabe", async (req, res) => {
     // Link löschen
-    db.exec("DELETE FROM Aufgabe_Board WHERE aufgabe="+id+";", (err) => {
-        if(err){    // FEHLER
-            console.log(err);
-            res.status(500).send("ERROR: "+err);
-            return;
-        }else {
-            // Aufgabe löschen
-            db.exec("DELETE FROM Aufgabe WHERE id="+id+";", (err) => {
-                if(err){ // FEHLER
-                    console.log(err);
-                    res.status(500).send("Error: "+err);
-                    return;
-                }else {
-                    // Erfolgsnachricht senden
-                    res.send("Deleted.");
-                }
-            });
-        }
-    })
+    deleteLinkAufgabeBoardStatement.bind(req.body.id);
+    let row = await muna.runPrepared(deleteLinkAufgabeBoardStatement);
+    if(muna.checkError(row, res)) return;
+
+    // Aufgabe löschen
+    deleteAufgabeStatement.bind(req.body.id);
+    row = await muna.runPrepared(deleteAufgabeStatement);
+    if(muna.checkError(row, res)) return;
+
+    // Erfolgsnachricht senden
+    res.send("Deleted.");
 });
 
 // Login - WIP
@@ -449,6 +318,7 @@ app.post("/login", (req, res) => {
         res.send(rows[0] == undefined?"Mitarbeiter wurde nicht gefunden":{id:rows[0].id, name:rows[0].name});
     })
 })
+
 
 // Link zur Jquery-Datei
 app.get("/jquery.js", (req, res) => {
