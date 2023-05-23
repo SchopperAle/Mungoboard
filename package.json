@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "express": "^4.18.2",
+    "express-session": "^1.17.3",
     "jquery": "^3.6.3",
     "sqlite3": "^5.1.4"
   },
@@ -8,7 +9,6 @@
   "description": "Das Tollste Scrumboard, mit voller Mungokraft.\r # Installation\r Projekt eineclonen\r NodeJS installieren (falls noch nicht vorhanden - Pilga ♥)\r Cmd im Projektordner öffnen\r Im cmd \"npm install\" eingeben.\r # Starten\r Mit \"node index.js\" oder \"npm run start\" starten",
   "version": "0.0.1",
   "main": "index.js",
-  "devDependencies": {},
   "scripts": {
     "start": "node index.js"
   },

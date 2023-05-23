@@ -130,7 +130,7 @@ muna.runPrepared = (statement) => {
 /**
  * Überprüft auf Fehler und sendet 
  * @param {*} row Response der DB
- * @param {*} res Express-Response
+ * @param {import("express").Response} res Express-Response
  * @param {* | undefined} msg Nachricht
  * @param {Number | undefined} code ResponseCode
  * @returns 

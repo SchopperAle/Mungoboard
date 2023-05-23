@@ -4,9 +4,11 @@ let express = require("express");           //Webserver
 let fs = require("fs");                     //File-System
 let bodyParser = require('body-parser');    //Post-verschlüsselung
 const muna = require("./backend/munadb");   //Datenbank mit extra Funktionen
+const crypto = require("crypto");           //Hash-Operationen
+const session = require("express-session");
 
 // Einstellungen von Datei laden
-let settings = JSON.parse(fs.readFileSync("./settings.json")+"");
+let settings = JSON.parse(fs.readFileSync("./settings.json").toString("utf-8"));
 
 // SQL-Teil
 let dbname = settings.databaseName; //Datenbank name von Settings laden
@@ -28,7 +30,8 @@ function createDB(){
     db.exec(`
         create TABLE IF NOT EXISTS Mitarbeiter(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name varchar(255)
+            name varchar(255),
+            passwort varchar(255)
         );
 
         create TABLE IF NOT EXISTS Board(
@@ -71,30 +74,55 @@ let app = express();        // Server
 // Sichere POSTs
 app.use(bodyParser.urlencoded({extended: true}));
 
+// Session erlauben
+app.use(session({
+    secret: crypto.randomBytes(128).toString("hex"),
+    resave: true,
+    saveUninitialized: false
+}));
+
 // Das "/web"-Verzeichnis für web-zugriff freigeben
 app.use("/web", express.static("web"));
 
 // HTML-Dateien pre-loaden -> Schnellere Antwortzeiten
-let boardMainView = ""+ fs.readFileSync("./web/board/mainView.html");
-let createTask = ""+ fs.readFileSync("./web/board/createTask.html");
+let boardMainView = fs.readFileSync("./web/board/mainView.html").toString("utf-8");
+let createTask = fs.readFileSync("./web/board/createTask.html").toString("utf-8");
+
+/**
+ * Überprüft die Session
+ * @param {import("express").Request} req 
+ * @param {import("express").Response} res 
+ * @returns {boolean} Ist Eingeloggt
+ */
+const checkSession = (req, res) => {
+    if((req.session.loggedIn ?? false) == false){
+        res.redirect("/page/login");
+        return false;
+    }
+    return true;
+} 
 
 // Default Route
 app.get("/", (req, res) => {
+    if(!checkSession(req, res)) return;
     res.sendFile(__dirname+"/web/board/createBoard.html");
 });
 
 // Profile Route
 app.get("/page/profile", (req, res) => {
+    if(!checkSession(req, res)) return;
     res.sendFile(__dirname+"/web/index.html");
 })
 
 // Create Mitarbeiter Route
 app.get("/page/createMitarbeiter", (req, res) => {
+    if(!checkSession(req, res)) return;
     res.sendFile(__dirname+"/web/dev/createMitarbeiter.html");
 });
 
 // Create Board Route
 app.get("/page/createBoard", (req, res) => {
+    if(!checkSession(req, res)) return;
     res.sendFile(__dirname+"/web/board/createBoard.html");
 });
 
@@ -105,12 +133,14 @@ app.get("/page/login", (req, res) => {
 
 // Create Task Route
 app.get("/page/board/:board/createTask", (req, res) => {
+    if(!checkSession(req, res)) return;
     let board = req.params.board;
     res.send(createTask.replaceAll("TOBESPECIFIEDID", board));
 });
 
 // Board Route
 app.get("/page/board/:board", async (req, res) => {
+    if(!checkSession(req, res)) return;
     let board = req.params.board;
     // Board auswählen
     let row = await muna.get("select * from Board WHERE id=?", board);
@@ -126,9 +156,12 @@ app.get("/page/board/:board", async (req, res) => {
 });
 
 // Create Mitarbeiter - WIP
+// Create Mitarbeiter Statement
+let createMitarbeiterStatement = muna.prepare("insert into Mitarbeiter (name, passwort) values (?, ?)");
 app.post("/createMitarbeiter", async(req, res) => {
     // Mitarbeiter anlegen
-    let row = await muna.exec("insert into Mitarbeiter (name) values (?)", req.body.name);
+    createMitarbeiterStatement.bind(req.body.name, req.body.passwort);
+    let row = await muna.runPrepared(createMitarbeiterStatement);
     if (muna.checkError(row, res, "Could not create "+req.body.name)) return;
     res.send("Created "+req.body.name);
 });
@@ -299,24 +332,23 @@ app.post("/deleteAufgabe", async (req, res) => {
 });
 
 // Login - WIP
-app.post("/login", (req, res) => {
+app.post("/login", async (req, res) => {
     let name = req.body.name;
-    if(name.includes("'")){     // SQL Injection ist nix Gutes.
-        res.send("SQL Injection wurde leider deaktiviert ;(");
-        return;
+    let passwort = req.body.passwort;
+
+    let row = muna.get("SELECT * FROM Mitarbeiter WHERE name like ? AND passwort like ?", name, passwort);
+    if(muna.checkError(row, res)) return;
+    
+    // Einloggen
+    if(row != undefined){
+        req.session.loggedIn = true;
+        req.session.login = {};
+        req.session.login.name = req.body.name;
+        req.session.login.passwort = req.body.passwort;
     }
 
-    // Einloggen
-    db.all("Select * from Mitarbeiter WHERE name like '"+name+"';", (err, rows) => {
-        if(err){    // FEHLER
-            console.log(err);
-            res.status(500).send("Error: "+err);
-            return;
-        }
-
-        // Loginstatus schicken
-        res.send(rows[0] == undefined?"Mitarbeiter wurde nicht gefunden":{id:rows[0].id, name:rows[0].name});
-    })
+    // Bestätigung schicken
+    res.send(row == undefined?"Mitarbeiter wurde nicht gefunden":{id:row.id, name:row.name});
 })
 
 

@@ -1,7 +1,8 @@
 // Login - WIP
 function login(){
     let name = $("#name").val();
-    $.ajax({url:"/login", type:"POST", data:{name:name}})
+    let passwort = $("#passwort").val();
+    $.ajax({url:"/login", type:"POST", data:{name:name, passwort:passwort}})
         .done((data) => {
             if(data.id == undefined){
                 alert(data);
