@@ -131,6 +131,11 @@ app.get("/page/login", (req, res) => {
     res.sendFile(__dirname+"/web/user/login.html");
 });
 
+// User Register Route
+app.get("/page/register", (req, res) => {
+    res.sendFile(__dirname+"/web/user/registration.html");
+});
+
 // Create Task Route
 app.get("/page/board/:board/createTask", (req, res) => {
     if(!checkSession(req, res)) return;
@@ -165,13 +170,18 @@ app.get("/logout", async (req, res) => {
     });
 });
 
-// Create Mitarbeiter - WIP
+// Create Mitarbeiter
 // Create Mitarbeiter Statement
 let createMitarbeiterStatement = muna.prepare("insert into Mitarbeiter (name, passwort) values (?, ?)");
 app.post("/createMitarbeiter", async(req, res) => {
+    // Überprüfen
+    let row = await muna.get("SELECT id FROM Mitarbeiter WHERE name = ?", req.body.name);
+    if(row?.id != undefined){
+        return res.status(500).send("User already exists");
+    }
     // Mitarbeiter anlegen
-    createMitarbeiterStatement.bind(req.body.name, req.body.passwort);
-    let row = await muna.runPrepared(createMitarbeiterStatement);
+    createMitarbeiterStatement.bind(req.body.name, crypto.createHash("sha512").update(req.body.passwort).digest("hex"));
+    row = await muna.runPrepared(createMitarbeiterStatement);
     if (muna.checkError(row, res, "Could not create "+req.body.name)) return;
     res.send("Created "+req.body.name);
 });
@@ -362,7 +372,7 @@ app.get("/mitarbeiterInBoard", async (req, res) => {
 // Login
 app.post("/login", async (req, res) => {
     let name = req.body.name;
-    let passwort = req.body.passwort;
+    let passwort = crypto.createHash("sha512").update(req.body.passwort).digest("hex");
 
     let row = await muna.get("SELECT * FROM Mitarbeiter WHERE name like ? AND passwort like ?", [name, passwort]);
     if(muna.checkError(row, res)) return;
@@ -392,6 +402,6 @@ app.listen(port, () => {
 });
 
 // muna.execS("insert into Mitarbeiter(name, passwort) VALUES ('ramsi', '123')");
-muna.allS("select * from Board").then((val) => {
+muna.allS("select * from Mitarbeiter").then((val) => {
     console.log(val)
 });

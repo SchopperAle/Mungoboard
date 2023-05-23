@@ -1,8 +1,22 @@
-// Login - WIP
+// Login
 function login(){
     let name = $("#name").val();
     let passwort = $("#passwort").val();
     $.ajax({url:"/login", type:"POST", data:{name:name, passwort:passwort}})
+        .done((data) => {
+            if(data?.id == undefined){
+                alert(data);
+            }else {
+                window.location.href = "/page/profile";
+            }
+        })
+}
+
+// Register
+function register(){
+    let name = $("#name").val();
+    let passwort = $("#passwort").val();
+    $.ajax({url:"/createMitarbeiter", type:"POST", data:{name:name, passwort:passwort}})
         .done((data) => {
             if(data?.id == undefined){
                 alert(data);
