@@ -20,7 +20,7 @@ function register(){
         .done((data) => {
             if(data?.id == undefined){
                 alert(data);
-                $("#loginButton").attr("id", "loginButton");
+                $("#lgbt").attr("id", "loginButton");
             }else {
                 window.location.href = "/page/profile";
             }

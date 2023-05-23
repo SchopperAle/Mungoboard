@@ -14,7 +14,7 @@ input[type="text"], input[type="password"]{
 
 }
 
-#loginButton{
+#loginButton, #lgbt{
     font-size: 1.4vw;
     background-color: #E5BA73;
     border: 2px black solid;
