@@ -21,3 +21,6 @@ function saveTask(){
         });
     })
 }
+
+// Get the Mitarbeiter
+$.get({url:"/"})
