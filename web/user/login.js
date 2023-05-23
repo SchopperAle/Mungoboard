@@ -20,15 +20,16 @@ function register(){
         .done((data) => {
             if(data?.id == undefined){
                 alert(data);
+                $("#loginButton").attr("id", "loginButton");
             }else {
                 window.location.href = "/page/profile";
             }
-        })
+        });
 }
 
 // Event-Listener -> Führt bei Enter-Klick zum Login
 addEventListener("keypress", (ev) => {
     if(ev.key == "Enter"){
-        $("#loginButton").trigger("click");
+        $("#loginButton").trigger("click").attr("id", "lgbt");
     }
 })

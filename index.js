@@ -175,7 +175,7 @@ app.get("/logout", async (req, res) => {
 let createMitarbeiterStatement = muna.prepare("insert into Mitarbeiter (name, passwort) values (?, ?)");
 app.post("/createMitarbeiter", async(req, res) => {
     // Überprüfen
-    let row = await muna.get("SELECT id FROM Mitarbeiter WHERE name = ?", req.body.name);
+    let row = await muna.get("SELECT * FROM Mitarbeiter WHERE name LIKE ?", req.body.name);
     if (muna.checkError(row, res)) return;
     if(row?.id != undefined){
         return res.status(500).send("User already exists");
