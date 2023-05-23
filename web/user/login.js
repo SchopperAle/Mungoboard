@@ -7,8 +7,6 @@ function login(){
             if(data.id == undefined){
                 alert(data);
             }else {
-                localStorage.setItem("id", data.id+"");
-                localStorage.setItem("name", data.name+"");
                 window.location.href = "/page/profile";
             }
         })

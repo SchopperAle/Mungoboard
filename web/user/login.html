@@ -21,14 +21,18 @@
         </div>
     </header>
 
+<h1>Anmeldung:</h1>
+
     <form id="login" onsubmit="event.preventDefault();login();">
-        <h1>Login:</h1>
-        <label for="name">Name: </label>
-        <input type="text" name="name" id="name"><br>
+
+        <label for="name" id="nameLabel">Name: </label>
+        <input type="text" name="name" id="name">
         
-        <label for="passwort">Passwort: </label>
-        <input type="password" name="passwort" id="passwort"><br>
-        <input type="submit" value="Login" id="loginButton">
+        <label id="passwortLabel" for="passwort">Passwort: </label>
+        <input type="password" name="passwort" id="passwort">
+
+        <div id="registrationLink">Kein Konto? <a href="registration.html">Jetzt registrieren!</a></div>
+        <input type="submit" value="Anmeldung" id="loginButton">
     </form>
 
     <script src="/web/user/login.js"></script>

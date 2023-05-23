@@ -155,6 +155,16 @@ app.get("/page/board/:board", async (req, res) => {
     );
 });
 
+// Logout
+app.get("/logout", async (req, res) => {
+    req.session.destroy((err) => {
+        if(err){
+            console.log(err);
+        }
+        return res.redirect("/");
+    });
+});
+
 // Create Mitarbeiter - WIP
 // Create Mitarbeiter Statement
 let createMitarbeiterStatement = muna.prepare("insert into Mitarbeiter (name, passwort) values (?, ?)");
@@ -170,6 +180,7 @@ app.post("/createMitarbeiter", async(req, res) => {
 // Prepare Statement
 let createBoardStatement = muna.prepare("insert into Board (name, beschreibung) values (?, ?)");
 app.post("/createBoard", async (req, res) => {
+    if(!checkSession(req, res)) return;
 
     // Funktion zum senden der BoardID, bei Erstellung -> Für addMitarbeiterToBoard
     const sendId = async() => {
@@ -190,7 +201,7 @@ app.post("/createBoard", async (req, res) => {
 //Get boards
 app.get("/boards", async (req, res) => {
     // Boards von der Datenbank holen
-    let rows = await muna.all("select * from Mitarbeiter m INNER JOIN Board_Mitarbeiter bm ON bm.mitarbeiter = m.id INNER JOIN Board b ON b.id = bm.board WHERE m.id = ? ORDER BY b.id DESC;", req.query.mitarbeiter);
+    let rows = await muna.all("select * from Mitarbeiter m INNER JOIN Board_Mitarbeiter bm ON bm.mitarbeiter = m.id INNER JOIN Board b ON b.id = bm.board WHERE m.id = ? ORDER BY b.id DESC;", req.query.mitarbeiter ?? req.session.login.id);
     if (muna.checkError(rows, res, "Error loading Boards")) return;
     // Boards senden
     res.send({data: rows});
@@ -202,12 +213,18 @@ let linkBoardMitarbeiterStatement = muna.prepare("insert into Board_Mitarbeiter 
 app.post("/addMitarbeiterToBoard", async (req, res) => {
     let id, boardId;
     let name, boardName;
+    let row;
 
-    // Mitarbeiterdaten holen
-    let row = await muna.get("select * from Mitarbeiter m WHERE m.id = ?", req.body.mitarbeiter);
-    if (muna.checkError(row, res)) return;
-    id = row.id;
-    name = row.name;
+    if(req.body.mitarbeiter == undefined){
+        id = req.session.login.id;
+        name = req.session.login.name;
+    }else{
+        // Mitarbeiterdaten holen
+        row = await muna.get("select * from Mitarbeiter m WHERE m.id = ?", req.body.mitarbeiter);
+        if (muna.checkError(row, res)) return;
+        id = row.id;
+        name = row.name;
+    }
 
     // Boarddaten holen
     row = await muna.get("select * from Board b WHERE b.id = ?", req.body.board);
@@ -331,20 +348,32 @@ app.post("/deleteAufgabe", async (req, res) => {
     res.send("Deleted.");
 });
 
-// Login - WIP
+// Mitarbeiter
+app.get("/mitarbeiterInBoard", async (req, res) => {
+    if(req.query.board == undefined || req.query.board == ""){
+        return res.status(500).send("Board doesn't exist.");
+    }
+
+    let rows = await muna.all("SELECT m.id, m.name FROM Board_Mitarbeiter bm INNER JOIN Mitarbeiter m ON bm.mitarbeiter = m.id WHERE mb.board = ?", req.query.board);
+    if(muna.checkError(rows, res)) return;
+    rows == undefined ? res.status(500).send("No Mitarbeiter.") : res.send(rows);
+})
+
+// Login
 app.post("/login", async (req, res) => {
     let name = req.body.name;
     let passwort = req.body.passwort;
 
-    let row = muna.get("SELECT * FROM Mitarbeiter WHERE name like ? AND passwort like ?", name, passwort);
+    let row = await muna.get("SELECT * FROM Mitarbeiter WHERE name like ? AND passwort like ?", [name, passwort]);
     if(muna.checkError(row, res)) return;
     
     // Einloggen
     if(row != undefined){
         req.session.loggedIn = true;
         req.session.login = {};
-        req.session.login.name = req.body.name;
-        req.session.login.passwort = req.body.passwort;
+        req.session.login.name = row.name;
+        // req.session.login.passwort = req.body.passwort;
+        req.session.login.id = row.id;
     }
 
     // Bestätigung schicken
@@ -361,3 +390,8 @@ app.get("/jquery.js", (req, res) => {
 app.listen(port, () => {
     console.log("Started.", "Listening to port "+port);
 });
+
+// muna.execS("insert into Mitarbeiter(name, passwort) VALUES ('ramsi', '123')");
+muna.allS("select * from Mitarbeiter").then((val) => {
+    console.log(val)
+})

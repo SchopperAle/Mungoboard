@@ -1,27 +1,54 @@
 /* CSS-Datei für die Login-Seite - WIP */
 
-#login{
-    margin: 2vw;
-    text-align: center;
-}
-
 h1 {
     font-size: 2vw;
+    font-family: "Bookman Old Style";
+    text-align: center;
 }
 
 input[type="text"], input[type="password"]{
     background-color: #E5BA73;
-    margin: 2vw;
+    margin: 1.4vw;
     border:2px black solid;
     font-size: 1.5vw;
+
 }
 
 #loginButton{
-    font-size: 2vw;
+    font-size: 1.4vw;
     background-color: #E5BA73;
     border: 2px black solid;
+    margin-left: 90px;
+    margin-right: 1.4vw;
+    grid-area: loginbutton;
 }
 
 label {
     font-size: 1.5vw;
+}
+form{
+    display: grid;
+    grid-template-areas: "namelabel nametextfield" "passwordlabel passwordtextfield" "registrationlink loginbutton";
+    justify-content: center;
+}
+
+#nameLabel{
+    grid-area: namelabel;
+}
+#name{
+    grid-area: nametextfield;
+}
+#passwortLabel{
+    grid-area: passwordlabel;
+}
+#passwort{
+    grid-area: passwordtextfield;
+}
+#registrationLink{
+    grid-area: registrationlink;
+}
+
+#registrationLink, #passwortLabel, #nameLabel{
+    margin-top: auto;
+    margin-bottom: auto;
 }

@@ -10,16 +10,6 @@ if(sessionStorage.getItem("bDesc") != undefined){
 
 // Board erstellen
 function createBoard(){
-    // Überprüfung: Ist Benutzer eingeloggt
-    if(localStorage.getItem("id") == undefined){
-        // Benutzer ist nicht eingeloggt
-        alert("Du bist nicht eingeloggt!");
-        sessionStorage.setItem("bName", $("#BoardName").val());
-        sessionStorage.setItem("bDesc", $("#BoardBeschreibung").val());
-        window.location.href="/web/user/login.html";
-        return;
-    }
-
     // Überprüfung, ob Board-Name leer ist
     let name = $("#BoardName").val();
     if(name == undefined || name == ""){
@@ -33,12 +23,19 @@ function createBoard(){
         .done((data) => {
             // Fehler bei der Erstellung
             if(data.id == undefined){
+                console.log(typeof(data), data.startsWith("<!"))
+                if(data.startsWith("<!")){
+                    sessionStorage.setItem("bName", name);
+                    sessionStorage.setItem("bDesc", beschreibung);
+                    document.write(data);
+                    return;
+                }
                 alert(data);
                 return;
             }
 
             // Ersteller zum Board hinzufügen
-            $.ajax({url: "/addMitarbeiterToBoard", type:"POST", data:{board: data.id, mitarbeiter: parseInt(localStorage.getItem("id"))}})
+            $.ajax({url: "/addMitarbeiterToBoard", type:"POST", data:{board: data.id}})
                 .done((nData) => {
                     alert(nData);
                     // Zu den Boards springen
