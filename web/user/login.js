@@ -4,7 +4,7 @@ function login(){
     let passwort = $("#passwort").val();
     $.ajax({url:"/login", type:"POST", data:{name:name, passwort:passwort}})
         .done((data) => {
-            if(data.id == undefined){
+            if(data?.id == undefined){
                 alert(data);
             }else {
                 window.location.href = "/page/profile";

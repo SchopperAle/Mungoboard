@@ -289,7 +289,7 @@ app.get("/aufgaben", async (req,res) => {
 // Get Aufgabe genau
 app.get("/aufgabe", async (req, res) => {
     // Aufgabe laden
-    let row = await muna.get("select * from aufgabe WHERE id = ?", req.query.aufgabe);
+    let row = await muna.get("select a.id, a.name, m.name as mitarbeiter, a.status, a.beschreibung from aufgabe a INNER JOIN Mitarbeiter m ON m.id = a.mitarbeiter WHERE a.id = ?", req.query.aufgabe);
     if(muna.checkError(row, res)) return;
 
     // Aufgabe existiert nicht
@@ -354,7 +354,7 @@ app.get("/mitarbeiterInBoard", async (req, res) => {
         return res.status(500).send("Board doesn't exist.");
     }
 
-    let rows = await muna.all("SELECT m.id, m.name FROM Board_Mitarbeiter bm INNER JOIN Mitarbeiter m ON bm.mitarbeiter = m.id WHERE mb.board = ?", req.query.board);
+    let rows = await muna.all("SELECT m.id, m.name FROM Board_Mitarbeiter bm INNER JOIN Mitarbeiter m ON bm.mitarbeiter = m.id WHERE bm.board = ?", req.query.board);
     if(muna.checkError(rows, res)) return;
     rows == undefined ? res.status(500).send("No Mitarbeiter.") : res.send(rows);
 })

@@ -136,10 +136,17 @@ header {
     background-color: white;
 }
 
-#aMitarbeiter, #aStatus {
+#aMitarbeiter, #aMitarbeiterSel, #aStatus {
     position: relative;
     left: 10%;
     user-select: none;
+}
+
+#aMitarbeiterSel{
+    border: black solid 1px;
+    background-color: white;
+    padding: .5em;
+    margin: .25em;
 }
 
 #aEdit, #aSave, #aDelete{

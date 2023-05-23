@@ -43,7 +43,7 @@ function showTask(taskOBJ){
         $("#aName").html(data.name);
         $("#aName").attr("data-id", data.id);
         $("#aBeschreibung").html(data.beschreibung);
-        $("#aMitarbeiter").html("Mitarbeiter: WIP-"+data.mitarbeiter);
+        $("#aMitarbeiter").html("Mitarbeiter: "+data.mitarbeiter);
         $("#aStatus").html("Status: "+data.status);
         $("#aStatus").attr("data-status",data.status);
         $("#blankScreen").show();
@@ -66,6 +66,16 @@ $("#aSave").hide();
 function enableEdit(){
     $("#aName").attr("contenteditable", "true");
     $("#aBeschreibung").attr("contenteditable", "true");
+    $("#aMitarbeiterSel").show();
+    $("#aMitarbeiter").hide();
+    $.get({url:"/mitarbeiterInBoard", data:{board:$("body").data("id")}}).then((data) => {
+        if(typeof(data) == "string"){
+            return window.location.href = "/";
+        }
+        data.forEach((val) => {
+            $("#aMitarbeiterSel").append(`<option id="aMitarbeiterSelN${val.id}" value="${val.id}">${val.name}</option>`);
+        });
+    });
     $("#aSave").show();
     $("#aEdit").hide();
 }
@@ -76,12 +86,15 @@ function saveChanges(){
         id: $("#aName").attr("data-id"),
         name: $("#aName").html(),
         beschreibung: $("#aBeschreibung").html().replaceAll("\n", "<br>"),
-        mitarbeiter: 1, // Platzhalter
+        mitarbeiter: $("#aMitarbeiterSel").val(),
         status: $("#aStatus").attr("data-status")
     }}).done((data) => {
         if(data == "Aufgabe Bearbeitet."){
             $("#aSave").hide();
             $("#aEdit").show();
+            $("#aMitarbeiterSel").hide();
+            $("#aMitarbeiter").show();
+            $("#aMitarbeiter").text("Mitarbeiter: "+$(`#aMitarbeiterSelN${$("#aMitarbeiterSel").val()}`).text());
             $("#aName").attr("contenteditable", "false");
             $("#aBeschreibung").attr("contenteditable", "false");
             $("#"+$("#aName").attr("data-id")).html($("#aName").html());

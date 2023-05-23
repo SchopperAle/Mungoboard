@@ -5,7 +5,7 @@ function saveTask(){
         return;
     }
     $.ajax({url: "/createAufgabe", type:"POST", data:{
-        mitarbeiter:1, 
+        mitarbeiter:$("#mitarbeiter").val(), 
         name:$("#TaskName").val(), 
         beschreibung:$("#TaskBeschreibung").val().replaceAll("\n", "<br>")} // \n werden für HTML zu <br>
     }).done((data) => {
@@ -23,4 +23,13 @@ function saveTask(){
 }
 
 // Get the Mitarbeiter
-$.get({url:"/"})
+$.get({url:"/mitarbeiterInBoard", data:{board: document.body.getAttribute("data-id")}}).done((data) => {
+    if(typeof(data) == "string"){
+        window.location.href = "/";
+        return;
+    }
+
+    data.forEach((val) => {
+        $("#mitarbeiter").append(`<option value=${val.id}>${val.name}</option>`);
+    })
+});
