@@ -1,7 +1,6 @@
 // Aufgaben laden
 $.ajax({url: "/aufgaben?board="+document.body.getAttribute("data-id")})
 .done((data)=>{
-    console.log(data);
     data.forEach((val) => {
         $("#"+val.status).html($("#"+val.status).html()+
             "<div class=\"task\" id=\""+val.id+"\" draggable=\"true\" ondragstart=\"drag(event)\" ondblclick=\"dblClicked(event)\">"+val.name+"</div>"
@@ -39,7 +38,6 @@ function dblClicked(ev) {
 function showTask(taskOBJ){
     $.ajax({url:"/aufgabe?aufgabe="+taskOBJ.id})
     .done((data) => {
-        console.log(data);
         $("#aName").html(data.name);
         $("#aName").attr("data-id", data.id);
         $("#aBeschreibung").html(data.beschreibung);
@@ -55,7 +53,11 @@ function showTask(taskOBJ){
 function hideViewAufgabe(){
     $("#blankScreen").hide();
     $("#viewAufgabe").hide(200);
+    $("#aName").attr("contenteditable", "false");
+    $("#aBeschreibung").attr("contenteditable", "false");
     $("#aSave").hide();
+    $("#aMitarbeiterSel").hide();
+    $("#aMitarbeiter").show();
     $("#aEdit").show();
 }
 
@@ -72,6 +74,7 @@ function enableEdit(){
         if(typeof(data) == "string"){
             return window.location.href = "/";
         }
+        $("#aMitarbeiterSel").html("");
         data.forEach((val) => {
             $("#aMitarbeiterSel").append(`<option id="aMitarbeiterSelN${val.id}" value="${val.id}">${val.name}</option>`);
         });

@@ -392,6 +392,6 @@ app.listen(port, () => {
 });
 
 // muna.execS("insert into Mitarbeiter(name, passwort) VALUES ('ramsi', '123')");
-muna.allS("select * from Mitarbeiter").then((val) => {
+muna.allS("select * from Board").then((val) => {
     console.log(val)
-})
+});
