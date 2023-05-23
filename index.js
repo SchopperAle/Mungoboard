@@ -176,6 +176,7 @@ let createMitarbeiterStatement = muna.prepare("insert into Mitarbeiter (name, pa
 app.post("/createMitarbeiter", async(req, res) => {
     // Überprüfen
     let row = await muna.get("SELECT id FROM Mitarbeiter WHERE name = ?", req.body.name);
+    if (muna.checkError(row, res)) return;
     if(row?.id != undefined){
         return res.status(500).send("User already exists");
     }
@@ -183,7 +184,19 @@ app.post("/createMitarbeiter", async(req, res) => {
     createMitarbeiterStatement.bind(req.body.name, crypto.createHash("sha512").update(req.body.passwort).digest("hex"));
     row = await muna.runPrepared(createMitarbeiterStatement);
     if (muna.checkError(row, res, "Could not create "+req.body.name)) return;
-    res.send("Created "+req.body.name);
+
+    // Einloggen
+    row = await muna.get("SELECT id FROM Mitarbeiter WHERE name LIKE ?", req.body.name);
+    if (muna.checkError(row, res)) return;
+    if(row?.id == undefined){
+        return res.status(500).send("Error");
+    }
+    req.session.loggedIn = true;
+    req.session.login = {};
+    req.session.login.name = req.body.name;
+    req.session.login.id = row.id;
+
+    res.send({id:0});
 });
 
 // Create Board
@@ -382,7 +395,6 @@ app.post("/login", async (req, res) => {
         req.session.loggedIn = true;
         req.session.login = {};
         req.session.login.name = row.name;
-        // req.session.login.passwort = req.body.passwort;
         req.session.login.id = row.id;
     }
 
