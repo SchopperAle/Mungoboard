@@ -87,6 +87,7 @@ app.use("/web", express.static("web"));
 // HTML-Dateien pre-loaden -> Schnellere Antwortzeiten
 let boardMainView = fs.readFileSync("./web/board/mainView.html").toString("utf-8");
 let createTask = fs.readFileSync("./web/board/createTask.html").toString("utf-8");
+let boardSettings = fs.readFileSync("./web/board/boardSettings.html").toString("utf-8");
 
 /**
  * Überprüft die Session
@@ -160,6 +161,26 @@ app.get("/page/board/:board", async (req, res) => {
     );
 });
 
+// Board Settings Route
+app.get("/page/board/settings/:board", async (req, res) => {
+    if(!checkSession(req, res)) return;
+    let board = req.params.board;
+
+    if(board == undefined || board == "null" || isNaN(parseInt(board))) return res.redirect("/");
+    
+    // Board auswählen
+    let row = await muna.get("select * from Board WHERE id=?", board);
+
+    if (muna.checkError(row, res, "Board wurde nicht gefunden", 404)) return;
+
+    // Pre-geloadetes Template verändern und senden
+    res.send(
+        boardSettings.replace("TOBESPECIFIEDID", board).replace("TOBESPECIFIEDID", board)      // Board-ID
+        .replace("TOBESPECIFIEDNAME", row.name).replace("TOBESPECIFIEDNAME", row.name)          // Board-Name
+        .replace("TOBESPECIFIEDDESC", row.beschreibung)  // Board-Beschreibung
+    );
+});
+
 // Logout
 app.get("/logout", async (req, res) => {
     req.session.destroy((err) => {
@@ -174,6 +195,18 @@ app.get("/logout", async (req, res) => {
 // Create Mitarbeiter Statement
 let createMitarbeiterStatement = muna.prepare("insert into Mitarbeiter (name, passwort) values (?, ?)");
 app.post("/createMitarbeiter", async(req, res) => {
+    
+    // Eingabe überprüfen
+    if((req.body.name?.length ?? 0) < 5){
+        return res.status(500).send("Name zu kurz");
+    }
+    if(req.body.name?.length > 25){
+        return res.status(500).send("Name zu lang");
+    }
+    if((req.body.passwort?.length ?? 0) < 1){
+        return res.status(500).send("Passwort fehlt ;(");
+    }
+
     // Überprüfen
     let row = await muna.get("SELECT * FROM Mitarbeiter WHERE name LIKE ?", req.body.name);
     if (muna.checkError(row, res)) return;
@@ -233,7 +266,32 @@ app.get("/boards", async (req, res) => {
 //Add Mitarbeiter to Board
 //Prepared Statement für Link
 let linkBoardMitarbeiterStatement = muna.prepare("insert into Board_Mitarbeiter (board, mitarbeiter) values (?, ?)");
-app.post("/addMitarbeiterToBoard", async (req, res) => {
+app.post("/addMitarbeiterToBoard", (req, res) => addMitarbeiterToBoard(req, res));
+app.post("/addMitarbeiterToBoardByName", (req, res) => addMitarbeiterToBoardByName(req, res))
+
+/**
+ * Fügt einen Mitarbeiter mithilfe eines Namens statt id zu einem Board hinzu
+ * @param {Express.Request} req 
+ * @param {Express.Response} res 
+ */
+const addMitarbeiterToBoardByName = async (req, res) => {
+    if(!checkSession(req, res)) return; // Eingeloggt?
+
+    // Mitarbeiterid von Namen holen
+    row = await muna.get("select m.id from Mitarbeiter m WHERE m.name = ?", req.body.mitarbeiter);
+    if (muna.checkError(row, res)) return;
+    req.body.mitarbeiter = (row?.id) ?? -1;
+
+    // Mitarbeiter hinzufügen
+    return await addMitarbeiterToBoard(req, res);
+};
+
+/**
+ * Fügt einen Mitarbeiter zu einem Board hinzu
+ * @param {Express.Request} req 
+ * @param {Express.Response} res 
+ */
+const addMitarbeiterToBoard = async (req, res) => {
     let id, boardId;
     let name, boardName;
     let row;
@@ -245,6 +303,7 @@ app.post("/addMitarbeiterToBoard", async (req, res) => {
         // Mitarbeiterdaten holen
         row = await muna.get("select * from Mitarbeiter m WHERE m.id = ?", req.body.mitarbeiter);
         if (muna.checkError(row, res)) return;
+        if (row == undefined) return res.status(404).send("Not found");
         id = row.id;
         name = row.name;
     }
@@ -262,6 +321,19 @@ app.post("/addMitarbeiterToBoard", async (req, res) => {
 
     // Nachricht senden
     res.send("Added "+name+" to "+boardName);
+};
+
+// Mitarbeiter von Board entfernen
+// Delete Link Board_Mitarbeiter Statement
+let deleteLinkBoardMitarbeiterStatement = muna.prepare("DELETE FROM Board_Mitarbeiter WHERE board=? AND mitarbeiter=?");
+app.post("/removeMitarbeiterFormBoard", async (req, res) => {
+    // Link löschen
+    deleteLinkBoardMitarbeiterStatement.bind(req.body.board, req.body.mitarbeiter);
+    let row = await muna.runPrepared(deleteLinkBoardMitarbeiterStatement);
+    if(muna.checkError(row, res)) return;
+
+    // Erfolgsnachricht senden
+    res.send("Deleted.");
 });
 
 // Create Aufgabe
@@ -380,7 +452,7 @@ app.get("/mitarbeiterInBoard", async (req, res) => {
     let rows = await muna.all("SELECT m.id, m.name FROM Board_Mitarbeiter bm INNER JOIN Mitarbeiter m ON bm.mitarbeiter = m.id WHERE bm.board = ?", req.query.board);
     if(muna.checkError(rows, res)) return;
     rows == undefined ? res.status(500).send("No Mitarbeiter.") : res.send(rows);
-})
+});
 
 // Login
 app.post("/login", async (req, res) => {

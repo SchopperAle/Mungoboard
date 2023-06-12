@@ -1,0 +1,123 @@
+
+body {
+    margin: 0;
+    font-family: arial, Helvetica, sans-serif;
+    overflow-x: hidden;
+    text-align: center;
+}
+
+header {
+    background-color: #E5BA73;
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    font-family: "Verdana", Geneva, sans-serif;
+    font-size: 2.5vw;
+}
+
+#header img {
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    height: 2.5vw;
+    vertical-align: middle;
+}
+
+#header img:hover {
+    opacity: 0.5;
+}
+
+#header a {
+    color:black;
+    text-decoration: none;
+}
+
+#header a:hover {
+    opacity: 0.5;
+}
+
+#header #newTask{
+    height: 3vw;
+}
+
+#header #downloadAsPDF{
+    height: 3vw;
+}
+
+#projectName{
+    text-align: center;
+    font-style: italic;
+}
+
+#settingscontainer {
+    width: 80%;
+    background-color: #E5BA73;
+    padding: 1em;
+    padding-top: 3em;
+    padding-bottom: 3em;
+    border-radius: 25px;
+    display: flex;
+    flex-direction: column;
+}
+
+#settingscontainercontainer{
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+}
+
+.setting{
+    display: grid;
+    grid-template-areas: "🎫 📃 📃 🧧";
+    margin-bottom: 2em;
+}
+
+#namelabel, #mitarbeiteslabel{
+    grid-area: 🎫;
+    font-size: 2em;
+}
+
+#name {
+    grid-area: 📃;
+    font-size: 1em;
+    text-align: center;
+}
+
+#namebutton {
+    grid-area: 🧧;
+    font-size: 1em;
+    margin-left: 3em;
+    background-color: #E5BA73;
+    color: black;
+    border: 2px black solid;
+}
+
+#namebutton:hover, #namebutton:focus {
+    opacity: .5;
+    cursor: pointer;
+}
+
+#mitarbeiters {
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    font-size: 1.5em;
+    grid-area: 📃;
+    margin-right: 4em;
+}
+
+#mitarbeiters div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    margin: 1em;
+}
+
+#mitarbeiters div span img {
+    width: 1.5em;
+}
+
+#mitarbeiters div span img:hover {
+    opacity: .5;
+    cursor: pointer;
+}

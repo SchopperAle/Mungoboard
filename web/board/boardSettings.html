@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<!-- Board-Settings-Seite -->
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Mungoboard</title>
+    <link rel="stylesheet" href="/web/board/boardSettings.css">
+    <link rel="shortcut icon" href="/web/images/favicon.ico" type="image/x-icon">
+    <script src="/jquery.js"></script>
+
+</head>
+<body data-id="TOBESPECIFIEDID" data-name="TOBESPECIFIEDNAME" data-desc="TOBESPECIFIEDDESC">
+    <!-- Nav-Bar -->
+    <header id="header">
+        <a href="/">MungoBoard</a>
+        <div id="projectName">TOBESPECIFIEDNAME</div>
+        <div>
+            <a href="/page/board/TOBESPECIFIEDID/createTask"><img id="newTask" src="/web/images/icon_newTask.png" alt="createTask"></a>
+            <img id="downloadAsPDF" src="/web/images/icon_savePDF.png" alt="saveAsPDF">
+            <img id="settings" src="/web/images/icon_settings.png" alt="Einstellungen" onclick="clickSettings();">
+            <img id="user" src="/web/images/icon_user.png" alt="Benutzerprofil" onclick="clickUser();">
+        </div>
+    </header>
+
+    <h1>Board bearbeiten</h1>
+
+    <div id="settingscontainercontainer">
+        <div id="settingscontainer">
+            <div class="setting hinzufuegen">
+                <label for="name" id="namelabel">Mitarbeiter hinzufügen</label>
+                <input type="text" id="name" placeholder="Benutzername des Mitarbeiters eingeben">
+                <button id="namebutton">hinzufügen</button>
+            </div>
+            <div class="setting">
+                <label for="mitarbeiters" id="mitarbeiteslabel">Bereits hinzugefügt</label>
+                <div id="mitarbeiters"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/web/main.js"></script>
+    <script src="/web/board/boardSettings.js"></script>
+</body>
+</html>

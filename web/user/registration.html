@@ -26,10 +26,10 @@
 <form id="login" onsubmit="event.preventDefault();register();">
 
     <label for="name" id="nameLabel">Name: </label>
-    <input type="text" name="name" id="name">
+    <input type="text" name="name" id="name" required>
 
     <label id="passwortLabel" for="passwort">Passwort: </label>
-    <input type="password" name="passwort" id="passwort">
+    <input type="password" name="passwort" id="passwort" required>
 
     <div id="registrationLink">Bereits ein Konto? <a href="/page/login">Jetzt anmelden!</a></div>
     <input type="submit" value="Registrieren" id="loginButton">
