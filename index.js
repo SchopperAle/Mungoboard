@@ -513,6 +513,9 @@ app.listen(port, () => {
     console.log("Started.", "Listening to port "+port);
 });
 
+
+
+// DEBUG - Do not ship
 // muna.execS("insert into Mitarbeiter(name, passwort) VALUES ('ramsi', '123')");
 muna.allS("select * from Mitarbeiter").then((val) => {
     console.log(val)
