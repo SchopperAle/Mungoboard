@@ -2,7 +2,7 @@
 // Get Mitarbeiters
 $.get({url:"/mitarbeiterInBoard", data:{board: document.body.getAttribute("data-id")}}).fail((data) => {
     alert(data); // Fehler
-}).done((data) => { // Success
+}).done((data) => {
     data?.forEach((val) => {
         let txt = `<div data-id="${val.id}"><span>${val.name}</span><span><img src="/web/images/icon_delete.png" alt="Löschen" onclick="removeMitarbeiter(${val.id});"></span></div>`;
         $("#mitarbeiters").append(txt);
@@ -16,12 +16,14 @@ $("#namebutton").on("click", () => {
     }
     $.post({url:"/addMitarbeiterToBoardByName", data:{board:document.body.getAttribute("data-id"), mitarbeiter:$("#name").val()}}).done(() => {
         window.location.href = window.location.href;
+    }).fail((data) => { // Fehler
+        alert(data.responseText);
     });
 });
 
 /**
  * Mitarbeiter entfernen
- * @param {number} mitarbeiter 
+ * @param {number} mitarbeiter Mitarbeiter
  */
 function removeMitarbeiter(mitarbeiter){
     $.post({url:"/removeMitarbeiterFormBoard", data:{mitarbeiter:mitarbeiter, board:document.body.getAttribute("data-id")}}).done(() => {
@@ -29,7 +31,7 @@ function removeMitarbeiter(mitarbeiter){
     })
 }
 
-// Häckchen
+// Häckchen-Klickbar machen
 $("#haekchen img").on("click", () => {
     window.location.href = "/page/board/"+document.body.getAttribute("data-id");
 });
