@@ -11,9 +11,18 @@ $.get({url:"/mitarbeiterInBoard", data:{board: document.body.getAttribute("data-
 
 // Mitarbeiter hinzufügen
 $("#namebutton").on("click", () => {
+    // Validierung
+    if($("#name").val().length < 1){
+        return alert("Name muss vorhanden sein.");
+    }
     if($("#name").val().length < 5){
         return alert("Name zu kurz.");
     }
+    if($("#name").val().length > 25){
+        return alert("Name zu lang.");
+    }
+
+    // Request senden
     $.post({url:"/addMitarbeiterToBoardByName", data:{board:document.body.getAttribute("data-id"), mitarbeiter:$("#name").val()}}).done(() => {
         window.location.href = window.location.href;
     }).fail((data) => { // Fehler

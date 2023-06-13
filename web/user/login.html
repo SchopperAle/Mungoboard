@@ -29,7 +29,7 @@
         <input type="text" name="name" id="name" autocomplete="off" required minlength="5" maxlength="25">
         
         <label id="passwortLabel" for="passwort">Passwort: </label>
-        <input type="password" name="passwort" id="passwort" required minlength="5" maxlength="30" pattern="(?=.*?[#?!@$%^&*\-\]\[äöü])(?=.*?[0-9])" title="Mindestens 1 Nummer und 1 Sonderzeichen">
+        <input type="password" name="passwort" id="passwort" required minlength="5" maxlength="30" pattern="(?=.*?[#?!@$%^&*\-\]\[äöü])(?=.*?[0-9]).*$" title="Mindestens 1 Nummer und 1 Sonderzeichen">
 
         <div id="registrationLink">Kein Konto? <a href="/page/register">Jetzt registrieren!</a></div>
         <input type="submit" value="Anmeldung" id="loginButton">
