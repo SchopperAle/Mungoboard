@@ -53,12 +53,11 @@ header {
 .board-block {
     width: 15%;
     height: 70vh;
-    float: left;
     background-color: #E5BA73;
-    padding: 20px;
+    padding: 3vh;
     opacity: 100%;
-    border-radius: 20px;
-    margin: 50px;
+    border-radius: 3vh;
+    margin: 5vh;
     display: flex;
     flex-direction: column;
     font-size: 25px;
