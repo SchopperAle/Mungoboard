@@ -216,6 +216,9 @@ app.post("/createMitarbeiter", async(req, res) => {
     if((req.body.passwort?.length ?? 0) < 1){
         return res.status(500).send("Passwort fehlt ;(");
     }
+    if(req.body.passwort?.length > 30){
+        return res.status(500).send("Passwort zu lang");
+    }
 
     // Überprüfen
     let row = await muna.get("SELECT * FROM Mitarbeiter WHERE name LIKE ?", req.body.name);
@@ -467,6 +470,20 @@ app.get("/mitarbeiterInBoard", async (req, res) => {
 
 // Login
 app.post("/login", async (req, res) => {
+    // Eingabe überprüfen
+    if((req.body.name?.length ?? 0) < 5){
+        return res.status(500).send("Name zu kurz");
+    }
+    if(req.body.name?.length > 25){
+        return res.status(500).send("Name zu lang");
+    }
+    if((req.body.passwort?.length ?? 0) < 1){
+        return res.status(500).send("Passwort fehlt ;(");
+    }
+    if(req.body.passwort?.length > 30){
+        return res.status(500).send("Passwort zu lang");
+    }
+
     let name = req.body.name;
     let passwort = crypto.createHash("sha512").update(req.body.passwort).digest("hex");
 
