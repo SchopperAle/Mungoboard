@@ -66,6 +66,12 @@ header {
     overflow-y: auto;
 }
 
+.scrum-board{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
 ::-webkit-scrollbar{
     width: 10px;
 }

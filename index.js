@@ -151,7 +151,6 @@ app.get("/page/board/:board", async (req, res) => {
     // User im Board?
     let row = await muna.get("select mitarbeiter from Board_Mitarbeiter WHERE mitarbeiter = ? AND board = ?", [req.session.login.id, board]);
     if (muna.checkError(row, res, "Board oder Mitarbeiter wurde nicht gefunden", 404)) return;
-    console.log(row, req.session.login.id, board);
     if (row?.mitarbeiter == undefined) return res.status(500).send("<h1>😮 du hast keinen Zugriff auf dieses Board</h1>");
 
     // Board auswählen
@@ -177,7 +176,6 @@ app.get("/page/board/settings/:board", async (req, res) => {
     // User im Board?
     let row = await muna.get("select mitarbeiter from Board_Mitarbeiter WHERE mitarbeiter = ? AND board = ?", [req.session.login.id, board]);
     if (muna.checkError(row, res, "Board oder Mitarbeiter wurde nicht gefunden", 404)) return;
-    console.log(row, req.session.login.id, board);
     if (row?.mitarbeiter == undefined) return res.status(500).send("<h1>😮 du hast keinen Zugriff auf dieses Board</h1>");
     
     // Board auswählen
