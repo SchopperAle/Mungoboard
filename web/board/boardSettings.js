@@ -4,7 +4,7 @@ $.get({url:"/mitarbeiterInBoard", data:{board: document.body.getAttribute("data-
     alert(data); // Fehler
 }).done((data) => { // Success
     data?.forEach((val) => {
-        let txt = `<div data-id="${val.id}"><span>${val.name}</span><span><img src="/web/images/icon_delete.png" onclick="removeMitarbeiter(${val.id});"></span></div>`;
+        let txt = `<div data-id="${val.id}"><span>${val.name}</span><span><img src="/web/images/icon_delete.png" alt="Löschen" onclick="removeMitarbeiter(${val.id});"></span></div>`;
         $("#mitarbeiters").append(txt);
     });
 });
@@ -28,3 +28,8 @@ function removeMitarbeiter(mitarbeiter){
         window.location.href = window.location.href;
     })
 }
+
+// Häckchen
+$("#haekchen img").on("click", () => {
+    window.location.href = "/page/board/"+document.body.getAttribute("data-id");
+});

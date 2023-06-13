@@ -69,7 +69,8 @@ header {
 .setting{
     display: grid;
     grid-template-areas: "🎫 📃 📃 🧧";
-    margin-bottom: 2em;
+    margin-top: 1em;
+    margin-bottom: 1em;
 }
 
 #namelabel, #mitarbeiteslabel{
@@ -120,4 +121,19 @@ header {
 #mitarbeiters div span img:hover {
     opacity: .5;
     cursor: pointer;
+}
+
+#haekchen img{
+    grid-area: 🧧;
+    transform: translateY(75%);
+    width: 4vw;
+}
+
+#haekchen img:hover {
+    opacity: .5;
+    cursor: pointer;
+}
+
+#haekchen {
+    justify-content: end;
 }
