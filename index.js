@@ -295,7 +295,8 @@ const addMitarbeiterToBoard = async (req, res) => {
     let id, boardId;
     let name, boardName;
     let row;
-
+    
+    // Mitarbeiter im Request vorhanden?
     if(req.body.mitarbeiter == undefined){
         id = req.session.login.id;
         name = req.session.login.name;
